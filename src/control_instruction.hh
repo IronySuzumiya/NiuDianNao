@@ -2,29 +2,30 @@
 #define __CONTROL_INSTRUCTION__
 
 #include "common.hh"
+#include "dram.hh"
 
 typedef struct control_instruction {
     enum ci_state {
-      LOAD_NBIN = 0,
-      LOAD_SB,
-      DO_OP,
-      STORE_NBOUT
+        LOAD_SB,
+        LOAD_NBIN,
+        DO_OP,
+        STORE_NBOUT
     };
     ci_state   state;
 
     enum ci_op {
-      NOP,
-      LOAD,
-      STORE,
-      READ,
-      WRITE,
-      MULT,
-      ADD,
-      RESET,
-      NBOUT,
-      NFU3,
-      SIGMOID,
-      INVALID
+        NOP,
+        LOAD,
+        STORE,
+        READ,
+        WRITE,
+        MULT,
+        ADD,
+        RESET,
+        NBOUT,
+        NFU3,
+        SIGMOID,
+        INVALID
     };
 
     ci_op   cp_end; 
@@ -50,6 +51,8 @@ typedef struct control_instruction {
     ci_op   nfu_nfu3_op;
     int     nfu_output_begin;
     int     nfu_output_end;
+
+    DramOp  dram_op;
 } ControlInstruction;
 
 typedef queue<ControlInstruction> CIQueue;

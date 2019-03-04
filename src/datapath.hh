@@ -21,6 +21,12 @@ private:
     DnnConfig *m_config;
     
     bool check_nb_out_complete();
+
+    bool read_sram(Sram *sram, mem_addr addr, mem_size size);
+    bool write_sram(Sram *sram, mem_addr addr, mem_size size);
+
+    bool read_dram(mem_addr addr, mem_size size);
+    bool write_dram(mem_addr addr, mem_size size);
     
     PipeStage **pipe_stages;
     pipe_reg *pipe_regs;

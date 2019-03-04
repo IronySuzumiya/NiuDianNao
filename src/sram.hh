@@ -37,7 +37,7 @@ public:
     void set_valid();
     void reset_valid();
 
-    void put_request(SramOp *op);
+    void push_request(SramOp *op);
 
 private:
     bool read(int port, SramOp *op);

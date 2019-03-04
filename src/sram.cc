@@ -122,7 +122,7 @@ bool Sram::check_addr(mem_addr addr) {
     return lines[index].valid;
 }
 
-void Sram::put_request(SramOp *op) {
+void Sram::push_request(SramOp *op) {
     requests.push(op);
 }
 

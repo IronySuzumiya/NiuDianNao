@@ -6,11 +6,10 @@
 class PipeOp {
 public:
     int serial_num;
-    SramOp nbin_op;
-    SramOp sb_op;
-    SramOp nbout_op;
+    SramOp nbin_sram_op;
+    SramOp sb_sram_op;
+    SramOp nbout_sram_op;
     bool is_read;
-    bool data_is_in_sram;
     bool data_is_ready;
 };
 
