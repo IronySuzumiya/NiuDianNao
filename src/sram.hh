@@ -34,6 +34,8 @@ public:
     
     void tick();
     bool is_busy();
+    void set_valid();
+    void reset_valid();
 
     void put_request(SramOp *op);
 

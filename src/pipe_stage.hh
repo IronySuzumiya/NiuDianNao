@@ -1,7 +1,20 @@
 #ifndef __PIPE_STAGE__
 #define __PIPE_STAGE__
 
-#include "pipe_operation.hh"
+#include "sram.hh"
+
+class PipeOp {
+public:
+    int serial_num;
+    SramOp nbin_op;
+    SramOp sb_op;
+    SramOp nbout_op;
+    bool is_read;
+    bool data_is_in_sram;
+    bool data_is_ready;
+};
+
+typedef std::queue<PipeOp *> PipeOpReg;
 
 class PipeStage {
 public:

@@ -23,9 +23,7 @@ Sram::Sram(const string& name, int line_size, int num_lines, int bit_width,
     }
 
     lines = new SramLine[n_lines];
-    for(int i = 0; i < n_lines; ++i) {
-        lines[i].valid = true;
-    }
+    reset_valid();
 }
 
 Sram::~Sram() {
@@ -72,9 +70,9 @@ void Sram::tick() {
                     SramOp *op = requests.front();
                     requests.pop();
                     if(op->is_read) {
-                        read(i, op);
+                        assert(read(i, op));
                     } else {
-                        write(i, op);
+                        assert(write(i, op));
                     }
                     if(requests.empty())
                         break;
@@ -99,6 +97,20 @@ bool Sram::is_busy() {
             return false;
     }
     return true;
+}
+
+void Sram::set_valid() {
+    // for test
+    for(int i = 0; i < n_lines; ++i) {
+        lines[i].valid = true;
+    }
+}
+
+void Sram::reset_valid() {
+    // for test
+    for(int i = 0; i < n_lines; ++i) {
+        lines[i].valid = false;
+    }
 }
 
 bool Sram::check_addr(mem_addr addr) {

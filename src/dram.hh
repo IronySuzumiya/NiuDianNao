@@ -20,7 +20,7 @@ public:
     void set_callbacks(DRAMSim::TransactionCompleteCB *read_callback, 
                        DRAMSim::TransactionCompleteCB *write_callback);
 private:
-    DRAMSim::MultiChannelMemorySystem *m_dram_sim;
+    DRAMSim::MultiChannelMemorySystem *dram_sim;
 };
 
 #endif
