@@ -1,4 +1,4 @@
-#include "pipestage.hh"
+#include "pipe_stage.hh"
 
 using namespace std;
 

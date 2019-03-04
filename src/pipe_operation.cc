@@ -1,4 +1,4 @@
-#include "pipeoperation.hh"
+#include "pipe_operation.hh"
 
 PipeOp::PipeOp(mem_addr nbin_addr, mem_size nbin_size,
                 mem_addr sb_addr, mem_size sb_size,

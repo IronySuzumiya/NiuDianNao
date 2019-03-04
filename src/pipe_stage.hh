@@ -1,7 +1,7 @@
 #ifndef __PIPE_STAGE__
 #define __PIPE_STAGE__
 
-#include "pipeoperation.hh"
+#include "pipe_operation.hh"
 
 class PipeStage {
 public:
@@ -10,7 +10,7 @@ public:
 
     bool push_op(PipeOp *op);
 
-    virtual void cycle() = 0;
+    virtual void tick() = 0;
     virtual void print();
 
 protected:

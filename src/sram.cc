@@ -18,7 +18,6 @@ Sram::Sram(const string& name, int line_size, int num_lines, int bit_width,
     ports = new SramPort[n_rw_ports];
     for(int i = 0; i < n_rw_ports; ++i) {
         ports[i].is_busy = false;
-        ports[i].is_read = false;
         ports[i].cur_access_cycle = 0;
         ports[i].op = NULL;
     }
@@ -39,16 +38,14 @@ Sram::~Sram() {
 
 void Sram::tick() {
     bool all_ports_busy = true;
-    int port_available;
 
-    for(int i = 0; i < n_rw_ports; ++i){
+    for(int i = 0; i < n_rw_ports; ++i) {
         if(ports[i].is_busy){
             cout << "SRAM " << name << " port " << i << " is busy." << endl;
             if(ports[i].cur_access_cycle >= cycles_per_access) {
                 SramOp *op = ports[i].op;
-                ports[i].is_busy = false;
                 cout << "SRAM " << name << " port " << i;
-                if(ports[i].is_read) {
+                if(op->is_read) {
                     cout << " READ";
                 } else {
                     cout << " WRITE";
@@ -56,27 +53,35 @@ void Sram::tick() {
                 cout << " is complete: ";
                 cout << " ADDR = " << op->addr << ", SIZE = " << op->size << "." << endl;
                 op->is_complete = true;
+                ports[i].is_busy = false;
                 ports[i].op = NULL;
 
                 all_ports_busy = false;
             } else {
-                ports[i].cur_access_cycle++;
+                ++ports[i].cur_access_cycle;
             }
         } else {
             all_ports_busy = false;
-            port_available = i;
         }
     }
 
     if(!requests.empty()) {
-        SramOp *op = requests.front();
         if(!all_ports_busy) {
-            if(op->is_read) {
-                read(port_available, op);
-            }else{
-                write(port_available, op);
+            for(int i = 0; i < n_rw_ports; ++i) {
+                if(!ports[i].is_busy) {
+                    SramOp *op = requests.front();
+                    requests.pop();
+                    if(op->is_read) {
+                        read(i, op);
+                    } else {
+                        write(i, op);
+                    }
+                    if(requests.empty())
+                        break;
+                }
             }
         } else {
+            SramOp *op = requests.front();
             cout << "Request is pending: ";
             if(op->is_read) {
                 cout << "READ ";
@@ -105,7 +110,10 @@ bool Sram::check_addr(mem_addr addr) {
     return lines[index].valid;
 }
 
-// Reads a line from the SRAM array
+void Sram::put_request(SramOp *op) {
+    requests.push(op);
+}
+
 bool Sram::read(int port, SramOp *op) {
     if(!check_addr(op->addr))
         return false;
@@ -115,7 +123,6 @@ bool Sram::read(int port, SramOp *op) {
     cout << " ADDR = " << op->addr << " SIZE = " << op->size << "." << endl;
 
     ports[port].is_busy = true;
-    ports[port].is_read = true;
     ports[port].cur_access_cycle = 0;
     ports[port].op = op;
 
@@ -131,7 +138,6 @@ bool Sram::write(int port, SramOp *op) {
     cout << " ADDR = " << op->addr << " SIZE = " << op->size << "." << endl;
 
     ports[port].is_busy = true;
-    ports[port].is_read = false;
     ports[port].cur_access_cycle = 0;
     ports[port].op = op;
 

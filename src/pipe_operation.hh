@@ -4,8 +4,6 @@
 #include "common.hh"
 #include "Sram.hh"
 
-typedef std::queue<PipeOp *> PipeOpReg;
-
 class PipeOp {
 public:
     PipeOp(mem_addr nbin_addr, mem_size nbin_size,
@@ -36,5 +34,7 @@ private:
     SramOp nbout_op;
     int serial_num;
 };
+
+typedef std::queue<PipeOp *> PipeOpReg;
 
 #endif

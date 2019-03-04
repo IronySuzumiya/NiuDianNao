@@ -1,28 +1,28 @@
 #ifndef __SRAM__
 #define __SRAM__
 
-#include "pipeoperation.hh"
+#include "pipe_operation.hh"
 
 typedef struct sram_line {
     bool valid;       // ready to be read
-    bool ready_to_be_writeback;    // ready to be stored to DRAM
-    bool can_be_overwritten; // partial sum, can be overwritten
+    bool ready_to_writeback;    // ready to be stored to DRAM
+    bool is_partial_sum; // partial sum, can be overwritten
     mem_addr addr;    // for sanity check, we shouldn't need to store this in hardware
 } SramLine;
 
 typedef struct sram_port {
     bool is_busy;
-    bool is_read;
     int cur_access_cycle;
     SramOp *op;
 } SramPort;
 
-struct SramOp {
+typedef struct sram_op {
+    int id;
     mem_addr addr;
     mem_size size;
     bool is_read;
     bool is_complete;
-};
+} SramOp;
 
 typedef std::queue<SramOp *> SramOpReg;
 
@@ -35,10 +35,12 @@ public:
     void tick();
     bool is_busy();
 
+    void put_request(SramOp *op);
+
+private:
     bool read(int port, SramOp *op);
     bool write(int port, SramOp *op);
 
-private:
     bool check_addr(mem_addr addr);
 
     SramOpReg requests;
