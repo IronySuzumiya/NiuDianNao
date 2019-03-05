@@ -17,7 +17,6 @@ typedef struct sram_port {
 } SramPort;
 
 typedef struct sram_op {
-    int id;
     mem_addr addr;
     mem_size size;
     bool is_read;

@@ -6,8 +6,6 @@
 #include "datapath.hh"
 #include "control_instruction.hh"
 
-typedef queue<DramOp> DramOpReg;
-
 class ControlProcessor {
 public:
     ControlProcessor(DnnConfig *cfg, Datapath *dp);
@@ -23,6 +21,10 @@ private:
     DnnConfig *cfg;
     Datapath *dp;
     CIQueue ciq;
+
+    std::queue<LoadStoreOp> mem_ops;
+
+    bool nbout_store;
 
     int sb_index;   // used to track progress of instruction in the DO_OP state
                     // since SB entries are never reused

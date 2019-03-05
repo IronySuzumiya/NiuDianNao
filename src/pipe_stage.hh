@@ -3,14 +3,22 @@
 
 #include "sram.hh"
 
+static int64_t global_serial_num = 0;
+
 class PipeOp {
 public:
+    PipeOp(mem_addr nbin_addr, mem_size nbin_size,
+        mem_addr sb_addr, mem_size sb_size,
+        mem_addr nbout_addr, mem_size nbout_size);
+    ~PipeOp() {};
+
+    bool data_is_ready();
+
+private:
     int serial_num;
     SramOp nbin_sram_op;
     SramOp sb_sram_op;
     SramOp nbout_sram_op;
-    bool is_read;
-    bool data_is_ready;
 };
 
 typedef std::queue<PipeOp *> PipeOpReg;

@@ -6,6 +6,7 @@
 
 typedef struct control_instruction {
     enum ci_state {
+        BEGIN,
         LOAD_SB,
         LOAD_NBIN,
         DO_OP,
@@ -21,6 +22,7 @@ typedef struct control_instruction {
         WRITE,
         MULT,
         ADD,
+        MAX,
         RESET,
         NBOUT,
         NFU3,

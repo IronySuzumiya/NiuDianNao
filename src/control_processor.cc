@@ -32,7 +32,7 @@ bool ControlProcessor::read_instructions(istringstream& is) {
     while(!is.eof()) {
         ControlInstruction ins;
         is >> ins;
-        ins.state = ControlInstruction::ci_state::LOAD_SB;
+        ins.state = BEGIN;
         ciq.push(ins);
     }
 }
@@ -40,51 +40,69 @@ bool ControlProcessor::read_instructions(istringstream& is) {
 bool ControlProcessor::execute_instruction(ControlInstruction *ci) {
     bool done = false;
 
+    if(ci->state == BEGIN) {
+        assert(ci->sb_read_op == LOAD);
+        if(ci->nbin_read_op == LOAD) {
+            ci->state = LOAD_NBIN;
+        } else {
+            assert(ci->nbin_read_op == READ);
+            ci->state = LOAD_SB;
+        }
+        if(ci->nbout_read_op == READ) {
+            // do something about it
+        } else {
+            assert(ci->nbout_read_op == NOP);
+        }
+        if(ci->nbout_write_op == WRITE) {
+            nbout_store = false;
+        } else {
+            assert(ci->nbout_write_op == STORE);
+            nbout_store = true;
+        }
+        assert(nfu_nfu1_op == MULT);
+        if(nfu_nfu2_op == ADD) {
+            // customize the datapath
+        } else {
+            assert(nfu_nfu2_op == MAX);
+            // customize the datapath
+        }
+        if(nfu_nfu2_in == RESET) {
+            // customize the datapath
+        } else {
+            assert(nfu_nfu2_in == NBOUT);
+            // customize the datapath
+        }
+        if(nfu_nfu2_out == NBOUT) {
+            // customize the datapath
+        } else {
+            assert(nfu_nfu2_out == NFU3);
+            // customize the datapath
+        }
+        assert(nfu_nfu3_op == SIGMOID);
+    }
+
     // All these states should be pipelined, we want to start computing once 
     // the first buffer entries are loaded
     switch(ci->state){
-        case cp_inst::LOAD_SB: // Load from DRAM into the SB SRAM
-            std::cout << "LOAD_SB " << inst->sb_address << std::endl;
-            if(m_dram_interface->can_accept_request()){
-                mf = new memory_fetch(inst->sb_address, inst->sb_size, READ, SB);
-
-                // TODO: This is only going to get one part of the data. The control processor will need to
-                // issue multiple DRAM read requests to populate the NBin and SB SRAMs
-                // m_dram_interface->do_access(mf);
-                m_dram_interface->push_request(mf->m_addr, false);
-               
-                if(inst->nbin_read_op == cp_inst::LOAD){
-                    inst->m_state = cp_inst::LOAD_NBIN;
-                }else{
-                    inst->m_state = cp_inst::DO_OP;
-                }
-
-                //mf->m_is_complete = true; // HACH for TESTING
-                m_mem_requests.push_back(mf); // Add memory fetch to pending queue
-
-                m_sb_index = 0;
-            }
+        case LOAD_NBIN: // Load from DRAM into the NBin SRAM
+            std::cout << "Load NBin: ADDR = " << ci->nbin_address
+                << " SIZE = " << ci->nbin_size << std::endl;
+            dp->load_nbin(ci->nbin_address, 0, ci->nbin_size);
+            ci->state = LOAD_SB;
             break;
-
-        case cp_inst::LOAD_NBIN: // Load from DRAM into the NBin SRAM
-            std::cout << "LOAD_NBIN " << inst->nbin_address << std::endl;
-            if(m_dram_interface->can_accept_request()){
-                mf = new memory_fetch(inst->nbin_address, inst->nbin_size, READ, NBin);
-
-                // TODO: This is only going to get one part of the data. The control processor will need to
-                // issue multiple DRAM read requests to populate the NBin and SB SRAMs
-                // m_dram_interface->do_access(mf);
-                m_dram_interface->push_request(mf->m_addr, false);
-
-                inst->m_state = cp_inst::DO_OP;
-
-               // mf->m_is_complete = true; // HACK for TESTING
-                m_mem_requests.push_back(mf); // Add memory fetch to pending queue
-            }
+        
+        case cp_inst::LOAD_SB: // Load from DRAM into the SB SRAM
+            std::cout << "Load SB: ADDR = " << ci->sb_address
+                << " SIZE = " << ci->sb_size << std::endl;
+            dp->load_sb(ci->sb_address, 0, ci->sb_size);
+            ci->state = DO_OP;
+            sb_index = 0;
             break;
 
         case cp_inst::DO_OP: // All data is loaded into the SRAMs, push pipe_ops into the main dnn_sim pipeline
 
+            
+            #if 0
             // First wait for all loads to complete, write data to SRAMs
             if(m_mem_requests.size() > 0){
                 memory_fetch *mf = m_mem_requests.front();
@@ -149,6 +167,8 @@ bool ControlProcessor::execute_instruction(ControlInstruction *ci) {
             }
 
             break;
+            #endif
+
         case cp_inst::STORE_NBOUT:
             // Write out NBout to DRAM
             std::cout << "STORE_NBOUT not implemented" << std::endl;
