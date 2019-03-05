@@ -43,6 +43,8 @@ private:
     bool write(int port, SramOp *op);
 
     bool check_addr(mem_addr addr);
+    bool check_valid(mem_addr addr);
+    bool check_write(mem_addr addr);
 
     SramOpReg requests;
 

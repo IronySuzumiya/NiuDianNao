@@ -15,7 +15,7 @@ typedef struct load_store_op {
     bool is_complete;
 } LoadStoreOp;
 
-typedef std::queue<LoadStoreOp *> LoadStoreOpReg;
+typedef std::queue<LoadStoreOp> LoadStoreOpReg;
 
 class Datapath {
 public:
@@ -27,6 +27,8 @@ public:
 
     void print_stats();
     void print_pipeline();
+
+    bool is_ready();
 
     void push_pipe_op(PipeOp *op);
     bool load_nbin(mem_addr dram_addr, mem_addr sram_addr, mem_size size);

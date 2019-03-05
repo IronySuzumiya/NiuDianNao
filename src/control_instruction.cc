@@ -1,6 +1,6 @@
 #include "control_instruction.hh"
 
-std::ostream& operator<<( std::ostream& oss, const ControlInstruction::ci_op op ) {
+std::ostream& operator<<(std::ostream& oss, const ControlInstruction::ci_op op) {
   switch (op) {
     case ControlInstruction::NOP:       oss << "NOP"; break;
     case ControlInstruction::LOAD:      oss << "LOAD"; break;

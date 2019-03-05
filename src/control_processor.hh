@@ -22,8 +22,6 @@ private:
     Datapath *dp;
     CIQueue ciq;
 
-    std::queue<LoadStoreOp> mem_ops;
-
     bool nbout_store;
 
     int sb_index;   // used to track progress of instruction in the DO_OP state

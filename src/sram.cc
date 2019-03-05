@@ -114,12 +114,17 @@ void Sram::reset_valid() {
 }
 
 bool Sram::check_addr(mem_addr addr) {
-    if(addr % (bit_width / 2))
-        return false;
+    return !(addr % (bit_width / 2));
+}
 
+bool Sram::check_valid(mem_addr addr) {
     int index = (addr / (bit_width / 2) ) % n_lines;
-
     return lines[index].valid;
+}
+
+bool Sram::check_write(mem_addr addr) {
+    int index = (addr / (bit_width / 2) ) % n_lines;
+    return lines[index].is_partial_sum || !lines[index].valid;
 }
 
 void Sram::push_request(SramOp *op) {
@@ -127,7 +132,7 @@ void Sram::push_request(SramOp *op) {
 }
 
 bool Sram::read(int port, SramOp *op) {
-    if(!check_addr(op->addr))
+    if(!check_addr(op->addr) || !check_valid(op->addr))
         return false;
     ++n_reads;
 
@@ -142,7 +147,7 @@ bool Sram::read(int port, SramOp *op) {
 }
 
 bool Sram::write(int port, SramOp *op) {
-    if(!check_addr(op->addr))
+    if(!check_addr(op->addr) || !check_write(op->addr))
         return false;
     ++n_writes;
 
