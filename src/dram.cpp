@@ -1,4 +1,4 @@
-#include "dram.hh"
+#include "dram.hpp"
 
 Dram::Dram(const std::string& dram_config_file, 
             const std::string& system_config, 

@@ -1,8 +1,7 @@
 #ifndef __CONTROL_INSTRUCTION__
 #define __CONTROL_INSTRUCTION__
 
-#include "common.hh"
-#include "dram.hh"
+#include "common.hpp"
 
 typedef struct control_instruction {
     enum ci_state {
@@ -12,7 +11,8 @@ typedef struct control_instruction {
         DO_OP,
         STORE_NBOUT
     };
-    ci_state   state;
+    
+    ci_state state;
 
     enum ci_op {
         NOP,
@@ -53,10 +53,13 @@ typedef struct control_instruction {
     ci_op   nfu_nfu3_op;
     int     nfu_output_begin;
     int     nfu_output_end;
-
-    DramOp  dram_op;
 } ControlInstruction;
 
-typedef queue<ControlInstruction> CIQueue;
+typedef std::queue<ControlInstruction> CIQueue;
+
+std::ostream& operator<<(std::ostream& oss, const ControlInstruction::ci_op op);
+std::istream& operator>>(std::istream &is, ControlInstruction::ci_op& op);
+std::ostream& operator<<(std::ostream& oss, const ControlInstruction& ins);
+std::istream & operator>>(std::istream& is, ControlInstruction& ins);
 
 #endif

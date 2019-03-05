@@ -1,7 +1,7 @@
 #ifndef __SRAM__
 #define __SRAM__
 
-#include "pipe_operation.hh"
+#include "common.hpp"
 
 typedef struct sram_line {
     bool valid;       // ready to be read
@@ -43,6 +43,8 @@ private:
     bool write(int port, SramOp *op);
 
     bool check_addr(mem_addr addr);
+    bool check_valid(mem_addr addr);
+    bool check_write(mem_addr addr);
 
     SramOpReg requests;
 

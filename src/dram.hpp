@@ -1,7 +1,7 @@
 #ifndef __DRAM__
 #define __DRAM__
 
-#include "common.hh"
+#include "common.hpp"
 #include "../DRAMSim2/DRAMSim.h"
 
 typedef struct dram_op {

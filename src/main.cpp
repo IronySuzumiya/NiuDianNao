@@ -1,7 +1,7 @@
-#include "niudiannao.hh"
+#include "niudiannao.hpp"
 
 int main(int argc, char** argv) {
-    NiuDianNao *ndn = new NiuDianNao();
+    NiuDianNao ndn;
     ndn.run();
     
     return 0;

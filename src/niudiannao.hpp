@@ -1,21 +1,21 @@
 #ifndef __NIUDIANNAO__
 #define __NIUDIANNAO__
 
-#include "dram.hh"
-#include "sram.hh"
-#include "control_processor.hh"
-#include "datapath.hh"
+#include "control_processor.hpp"
+#include "datapath.hpp"
 
 class NiuDianNao {
 public:
     NiuDianNao();
-    virtual ~NiuDianNao();
-    void tick();
+    ~NiuDianNao();
+    void run();
 
 private:
-    Dram *dram;
+    void tick();
+
     ControlProcessor *cp;
     Datapath *dp;
+    int64_t cycle;
 };
 
 #endif
