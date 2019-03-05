@@ -1,7 +1,7 @@
 #ifndef __DNN_CONFIG__
 #define __DNN_CONFIG__
 
-#include "option_parser.h"
+#include "option_parser.hpp"
 
 class DnnConfig {
 public:

@@ -1,10 +1,8 @@
 #ifndef __CONTROL_PROCESSOR__
 #define __CONTROL_PROCESSOR__
 
-#include "dram.hh"
-#include "config.hh"
-#include "datapath.hh"
-#include "control_instruction.hh"
+#include "datapath.hpp"
+#include "control_instruction.hpp"
 
 class ControlProcessor {
 public:
@@ -12,8 +10,7 @@ public:
     ~ControlProcessor() {};
 
     void tick();
-    bool read_instructions(std::ifstream& is);
-    bool read_instructions(std::istringstream& is);
+    bool read_instructions(std::istream& is);
     
 private:
     bool execute_instruction(ControlInstruction *ci);

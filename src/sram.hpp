@@ -1,7 +1,7 @@
 #ifndef __SRAM__
 #define __SRAM__
 
-#include "pipe_operation.hh"
+#include "common.hpp"
 
 typedef struct sram_line {
     bool valid;       // ready to be read

@@ -1,4 +1,4 @@
-#include "control_instruction.hh"
+#include "control_instruction.hpp"
 
 std::ostream& operator<<(std::ostream& oss, const ControlInstruction::ci_op op) {
   switch (op) {
@@ -9,6 +9,7 @@ std::ostream& operator<<(std::ostream& oss, const ControlInstruction::ci_op op) 
     case ControlInstruction::WRITE:     oss << "WRITE"; break;
     case ControlInstruction::MULT:      oss << "MULT"; break;
     case ControlInstruction::ADD:       oss << "ADD"; break;
+    case ControlInstruction::MAX:       oss << "MAX"; break;
     case ControlInstruction::RESET:     oss << "RESET"; break;
     case ControlInstruction::NBOUT:     oss << "NBOUT"; break;
     case ControlInstruction::NFU3:      oss << "NFU3"; break;
@@ -29,6 +30,7 @@ std::istream& operator>>(std::istream &is, ControlInstruction::ci_op& op) {
   else if (str == "WRITE")      op = ControlInstruction::WRITE;
   else if (str == "MULT")       op = ControlInstruction::MULT;
   else if (str == "ADD")        op = ControlInstruction::ADD;
+  else if (str == "MAX")        op = ControlInstruction::MAX;
   else if (str == "RESET")      op = ControlInstruction::RESET;
   else if (str == "NBOUT")      op = ControlInstruction::NBOUT;
   else if (str == "NFU3")       op = ControlInstruction::NFU3;

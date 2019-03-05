@@ -1,7 +1,7 @@
 #ifndef __PIPE_STAGE__
 #define __PIPE_STAGE__
 
-#include "sram.hh"
+#include "sram.hpp"
 
 static int64_t global_serial_num = 0;
 
@@ -13,9 +13,10 @@ public:
     ~PipeOp() {};
 
     bool data_is_ready();
+    int64_t get_serial_num();
 
 private:
-    int serial_num;
+    int64_t serial_num;
     SramOp nbin_sram_op;
     SramOp sb_sram_op;
     SramOp nbout_sram_op;

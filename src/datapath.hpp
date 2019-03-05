@@ -1,10 +1,10 @@
 #ifndef __DATA_PATH__
 #define __DATA_PATH__
 
-#include "sram.hh"
-#include "nfu1.hh"
-#include "nfu2.hh"
-#include "nfu3.hh"
+#include "dram.hpp"
+#include "sram.hpp"
+#include "pipe_stage.hpp"
+#include "config.hpp"
 
 typedef struct load_store_op {
     Sram *sram;
@@ -28,7 +28,8 @@ public:
     void print_stats();
     void print_pipeline();
 
-    bool is_ready();
+    bool is_all_needed_data_in_sram();
+    bool is_nbout_writeback_complete();
 
     void push_pipe_op(PipeOp *op);
     bool load_nbin(mem_addr dram_addr, mem_addr sram_addr, mem_size size);
@@ -37,8 +38,6 @@ public:
 
 private:
     DnnConfig *cfg;
-    
-    bool check_nb_out_complete();
 
     bool read_nbin(SramOp *sram_op);
     bool read_sb(SramOp *sram_op);

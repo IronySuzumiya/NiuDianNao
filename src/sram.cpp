@@ -1,4 +1,4 @@
-#include "sram.hh"
+#include "sram.hpp"
 
 using namespace std;
 

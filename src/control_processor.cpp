@@ -1,17 +1,10 @@
-#include "control_processor.hh"
+#include "control_processor.hpp"
 
 using namespace std;
 
-ControlProcessor::ControlProcessor(DnnConfig *cfg, Datapath *dp, Dram *dram) {
+ControlProcessor::ControlProcessor(DnnConfig *cfg, Datapath *dp) {
     this->cfg = cfg;
     this->dp = dp;
-    this->dram = dram;
-
-    read_callback = new DRAMSim::Callback<ControlProcessor, void, unsigned, uint64_t, uint64_t>
-                            (this, &ControlProcessor::read_complete_callback);
-    write_callback = new DRAMSim::Callback<ControlProcessor, void, unsigned, uint64_t, uint64_t>
-                            (this, &ControlProcessor::write_complete_callback);
-    dram->set_callbacks(m_read_callback, m_write_callback);
 }
 
 void ControlProcessor::tick() {
@@ -24,16 +17,11 @@ void ControlProcessor::tick() {
     }
 }
 
-bool ControlProcessor::read_instructions(ifstream& is) {
-    // TODO
-    return false;
-}
-
-bool ControlProcessor::read_instructions(istringstream& is) {
+bool ControlProcessor::read_instructions(istream& is) {
     while(!is.eof()) {
         ControlInstruction ins;
         is >> ins;
-        ins.state = BEGIN;
+        ins.state = ControlInstruction::BEGIN;
         ciq.push(ins);
     }
 }
@@ -41,66 +29,66 @@ bool ControlProcessor::read_instructions(istringstream& is) {
 bool ControlProcessor::execute_instruction(ControlInstruction *ci) {
     bool done = false;
 
-    if(ci->state == BEGIN) {
-        assert(ci->sb_read_op == LOAD);
-        if(ci->nbin_read_op == LOAD) {
-            ci->state = LOAD_NBIN;
+    if(ci->state == ControlInstruction::BEGIN) {
+        assert(ci->sb_read_op == ControlInstruction::LOAD);
+        if(ci->nbin_read_op == ControlInstruction::LOAD) {
+            ci->state = ControlInstruction::LOAD_NBIN;
         } else {
-            assert(ci->nbin_read_op == READ);
-            ci->state = LOAD_SB;
+            assert(ci->nbin_read_op == ControlInstruction::READ);
+            ci->state = ControlInstruction::LOAD_SB;
         }
-        if(ci->nbout_read_op == READ) {
+        if(ci->nbout_read_op == ControlInstruction::READ) {
             // do something
         } else {
-            assert(ci->nbout_read_op == NOP);
+            assert(ci->nbout_read_op == ControlInstruction::NOP);
             // do something
         }
-        if(ci->nbout_write_op == WRITE) {
+        if(ci->nbout_write_op == ControlInstruction::WRITE) {
             nbout_store = false;
         } else {
-            assert(ci->nbout_write_op == STORE);
+            assert(ci->nbout_write_op == ControlInstruction::STORE);
             nbout_store = true;
         }
-        assert(nfu_nfu1_op == MULT);
-        if(nfu_nfu2_op == ADD) {
+        assert(ci->nfu_nfu1_op == ControlInstruction::MULT);
+        if(ci->nfu_nfu2_op == ControlInstruction::ADD) {
             // customize the datapath
         } else {
-            assert(nfu_nfu2_op == MAX);
+            assert(ci->nfu_nfu2_op == ControlInstruction::MAX);
             // customize the datapath
         }
-        if(nfu_nfu2_in == RESET) {
+        if(ci->nfu_nfu2_in == ControlInstruction::RESET) {
             // customize the datapath
         } else {
-            assert(nfu_nfu2_in == NBOUT);
+            assert(ci->nfu_nfu2_in == ControlInstruction::NBOUT);
             // customize the datapath
         }
-        if(nfu_nfu2_out == NBOUT) {
+        if(ci->nfu_nfu2_out == ControlInstruction::NBOUT) {
             // customize the datapath
         } else {
-            assert(nfu_nfu2_out == NFU3);
+            assert(ci->nfu_nfu2_out == ControlInstruction::NFU3);
             // customize the datapath
         }
-        assert(nfu_nfu3_op == SIGMOID);
+        assert(ci->nfu_nfu3_op == ControlInstruction::SIGMOID);
     }
 
     switch(ci->state){
-        case LOAD_NBIN:
+        case ControlInstruction::LOAD_NBIN:
             cout << "Load NBin: ADDR = " << ci->nbin_address
                 << " SIZE = " << ci->nbin_size << endl;
             dp->load_nbin(ci->nbin_address, 0, ci->nbin_size);
-            ci->state = LOAD_SB;
+            ci->state = ControlInstruction::LOAD_SB;
             break;
         
-        case LOAD_SB:
+        case ControlInstruction::LOAD_SB:
             cout << "Load SB: ADDR = " << ci->sb_address
                 << " SIZE = " << ci->sb_size << endl;
             dp->load_sb(ci->sb_address, 0, ci->sb_size);
-            ci->state = DO_OP;
+            ci->state = ControlInstruction::DO_OP;
             sb_index = 0;
             break;
 
-        case DO_OP:
-            if(dp->is_ready()) {
+        case ControlInstruction::DO_OP:
+            if(dp->is_all_needed_data_in_sram()) {
                 int data_size = (cfg->bit_width / 8); // in bytes
 
                 int num_output_lines    = cfg->num_outputs / cfg->nbout_line_length;
@@ -122,7 +110,7 @@ bool ControlProcessor::execute_instruction(ControlInstruction *ci) {
 
                 if (sb_index == cfg->sb_num_lines) {
                     if(nbout_store) {
-                        ci->state = STORE_NBOUT;
+                        ci->state = ControlInstruction::STORE_NBOUT;
                     } else {
                         done = true;
                     }
@@ -130,7 +118,7 @@ bool ControlProcessor::execute_instruction(ControlInstruction *ci) {
             }
             break;
 
-        case STORE_NBOUT:
+        case ControlInstruction::STORE_NBOUT:
             cout << "Store NBout: ADDR = " << ci->nbout_address
                 << " SIZE = " << ci->nbout_size << endl;
             dp->store_nbout(0, ci->nbout_address, ci->nbout_size);
