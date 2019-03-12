@@ -11,11 +11,8 @@ typedef struct load_store_op {
     DramOp dram_op;
     SramOp sram_op;
     bool is_load;
-    bool has_been_sent_to_dram;
-    bool is_complete;
+    bool is_sent;
 } LoadStoreOp;
-
-typedef std::queue<LoadStoreOp> LoadStoreOpReg;
 
 class Datapath {
 public:
@@ -28,21 +25,20 @@ public:
     void print_stats();
     void print_pipeline();
 
-    bool is_all_needed_data_in_sram();
-    bool is_nbout_writeback_complete();
+    bool is_ready();
 
     void push_pipe_op(PipeOp *op);
-    bool load_nbin(mem_addr dram_addr, mem_addr sram_addr, mem_size size);
-    bool load_sb(mem_addr dram_addr, mem_addr sram_addr, mem_size size);
-    bool store_nbout(mem_addr sram_addr, mem_addr dram_addr, mem_size size);
+    void load_nbin(mem_addr dram_addr, mem_addr sram_addr, mem_size size);
+    void load_sb(mem_addr dram_addr, mem_addr sram_addr, mem_size size);
+    void store_nbout(mem_addr dram_addr, mem_addr sram_addr, mem_size size);
 
 private:
     DnnConfig *cfg;
 
-    bool read_nbin(SramOp *sram_op);
-    bool read_sb(SramOp *sram_op);
-    bool read_nbout(SramOp *sram_op);
-    bool write_nbout(SramOp *sram_op);
+    void read_nbin(SramOp *op);
+    void read_sb(SramOp *op);
+    void read_nbout(SramOp *op);
+    void write_nbout(SramOp *op);
     
     PipeStage **pipe_stages;
     PipeOpReg *pipe_regs;
@@ -50,7 +46,7 @@ private:
     Sram *sb;
     Sram *nbout;
     Dram *dram;
-    LoadStoreOpReg requests;
+    std::deque<LoadStoreOp> requests;
     
     int reg_size;
 };

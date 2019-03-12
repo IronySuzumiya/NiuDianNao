@@ -21,26 +21,31 @@ Dram::~Dram() {
 }
 
 void Dram::tick() {
+    if(!new_requests.empty()) {
+        do {
+            if(dram_sim->willAcceptTransaction()) {
+                DramOp *op = new_requests.front();
+                new_requests.pop();
+                dram_sim->addTransaction(!op->is_read, op->addr);
+                active_requests.push_back(op);
+            }
+        } while(!new_requests.empty());
+    }
     dram_sim->update();
 }
 
-bool Dram::can_accept_request() const {
-    return dram_sim->willAcceptTransaction();
-}
-
 void Dram::push_request(DramOp *op) {
-    requests.push_back(op);
-    dram_sim->addTransaction(!op->is_read, op->addr);
+    new_requests.push(op);
 }
 
 void Dram::read_complete_callback(unsigned id, uint64_t addr, uint64_t clock_cycle) {
     std::cout << "DRAM Read callback for address "  <<  addr << " (cycle: " << clock_cycle << ")" << std::endl;
 
-    DramOpReg::iterator it;
-    for(it = requests.begin(); it != requests.end(); ++it) {
+    std::deque<DramOp *>::iterator it;
+    for(it = active_requests.begin(); it != active_requests.end(); ++it) {
         if(addr == (*it)->addr) {
             (*it)->is_complete = true;
-            requests.erase(it);
+            active_requests.erase(it);
             break;
         }
     }
@@ -49,11 +54,11 @@ void Dram::read_complete_callback(unsigned id, uint64_t addr, uint64_t clock_cyc
 void Dram::write_complete_callback(unsigned id, uint64_t addr, uint64_t clock_cycle) {
     std::cout << "DRAM Write callback for address "  <<  addr << " (cycle: " << clock_cycle << ")" << std::endl;
 
-    DramOpReg::iterator it;
-    for(it = requests.begin(); it != requests.end(); ++it) {
+    std::deque<DramOp *>::iterator it;
+    for(it = active_requests.begin(); it != active_requests.end(); ++it) {
         if(addr == (*it)->addr) {
             (*it)->is_complete = true;
-            requests.erase(it);
+            active_requests.erase(it);
             break;
         }
     }

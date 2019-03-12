@@ -4,14 +4,14 @@
 #include "common.hpp"
 #include "../DRAMSim2/DRAMSim.h"
 
+#define MAKE_DRAM_OP(addr, size, is_read) {(addr), (size), (is_read), false}
+
 typedef struct dram_op {
     mem_addr addr;
     mem_size size;
     bool is_read;
     bool is_complete;
 } DramOp;
-
-typedef std::deque<DramOp *> DramOpReg;
 
 class Dram {
 public:
@@ -22,16 +22,16 @@ public:
                     mem_size memory_size);
     ~Dram();
     void tick();
-    bool can_accept_request() const;
     void push_request(DramOp *op);
-    void Dram::read_complete_callback(unsigned id, uint64_t address, uint64_t clock_cycle);
-    void Dram::write_complete_callback(unsigned id, uint64_t address, uint64_t clock_cycle);
+    void read_complete_callback(unsigned id, uint64_t address, uint64_t clock_cycle);
+    void write_complete_callback(unsigned id, uint64_t address, uint64_t clock_cycle);
 
 private:
     DRAMSim::MultiChannelMemorySystem *dram_sim;
     DRAMSim::TransactionCompleteCB *read_callback;
     DRAMSim::TransactionCompleteCB *write_callback;
-    DramOpReg requests;
+    std::queue<DramOp *> new_requests;
+    std::deque<DramOp *> active_requests;
 };
 
 #endif

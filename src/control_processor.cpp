@@ -88,7 +88,7 @@ bool ControlProcessor::execute_instruction(ControlInstruction *ci) {
             break;
 
         case ControlInstruction::DO_OP:
-            if(dp->is_all_needed_data_in_sram()) {
+            if(dp->is_ready()) {
                 int data_size = (cfg->bit_width / 8); // in bytes
 
                 int num_output_lines    = cfg->num_outputs / cfg->nbout_line_length;

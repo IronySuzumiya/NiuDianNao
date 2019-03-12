@@ -3,6 +3,8 @@
 
 #include "common.hpp"
 
+#define MAKE_SRAM_OP(addr, size, is_read) {(addr), (size), (is_read), false}
+
 typedef struct sram_line {
     bool valid;       // ready to be read
     bool ready_to_writeback;    // ready to be stored to DRAM
