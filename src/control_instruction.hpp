@@ -3,7 +3,7 @@
 
 #include "common.hpp"
 
-typedef struct control_instruction {
+struct ControlInstruction {
     enum ci_state {
         BEGIN,
         LOAD_SB,
@@ -53,7 +53,7 @@ typedef struct control_instruction {
     ci_op   nfu_nfu3_op;
     int     nfu_output_begin;
     int     nfu_output_end;
-} ControlInstruction;
+};
 
 typedef std::queue<ControlInstruction> CIQueue;
 

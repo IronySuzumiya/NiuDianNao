@@ -11,13 +11,21 @@ void ControlProcessor::tick() {
     if(!ciq.empty()) {
         ControlInstruction *ci = &ciq.front();
         if(execute_instruction(ci)) {
-            cout << "Done" << endl;
+            cout << "Control instruction is done." << endl;
             ciq.pop();
         }
     }
 }
 
-bool ControlProcessor::read_instructions(istream& is) {
+void ControlProcessor::read_instruction(string s) {
+    ControlInstruction ins;
+    stringstream ss(s);
+    ss >> ins;
+    ins.state = ControlInstruction::BEGIN;
+    ciq.push(ins);
+}
+
+void ControlProcessor::read_instructions(istream& is) {
     while(!is.eof()) {
         ControlInstruction ins;
         is >> ins;

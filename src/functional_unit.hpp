@@ -1,20 +1,18 @@
 #ifndef __FUNCTIONAL_UNIT__
 #define __FUNCTIONAL_UNIT__
 
-#include "common.h"
+#include "common.hpp"
 
-class functional_unit {
+class FunctionalUnit {
 public:
-    functional_unit() : m_num_ops(0) {}
-    ~functional_unit() {}
+    FunctionalUnit() : num_ops(0) {}
+    virtual ~FunctionalUnit() {}
     
-    void do_op();
-    unsigned get_stats();
+    virtual void do_op();
+    long long get_stats();
 
-private:
-    // Performance counter for the number of operations performed.
-    unsigned m_num_ops;
-
+protected:
+    long long num_ops;
 };
 
 #endif

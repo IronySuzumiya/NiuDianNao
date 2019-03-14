@@ -2,25 +2,20 @@
 #define __NFU3__
 
 #include "pipe_stage.hpp"
-
-#include "config.hpp"
-#include "functional_unit.h"
+#include "functional_unit.hpp"
 
 class PipeStageNFU3 : public PipeStage {
 public:
-
     PipeStageNFU3(PipeOpReg *reg_in, PipeOpReg *reg_out, int queue_size, int n_stages, unsigned num_multipliers, unsigned num_adders);
     ~PipeStageNFU3();
 
-    void tick();
-    void print();
+    void do_op();
 
 private:
-    // Functional units
-    unsigned m_num_multipliers;
-    unsigned m_num_adders;
-    functional_unit **m_multipliers;    // Multipliers
-    functional_unit **m_adders;         // Adders
+    unsigned num_multipliers;
+    unsigned num_adders;
+    FunctionalUnit **multipliers;
+    FunctionalUnit **adders;
 };
 
 #endif

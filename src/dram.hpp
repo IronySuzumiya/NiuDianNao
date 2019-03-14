@@ -6,12 +6,12 @@
 
 #define MAKE_DRAM_OP(addr, size, is_read) {(addr), (size), (is_read), false}
 
-typedef struct dram_op {
+struct DramOp {
     mem_addr addr;
     mem_size size;
     bool is_read;
     bool is_complete;
-} DramOp;
+};
 
 class Dram {
 public:

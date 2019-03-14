@@ -28,10 +28,10 @@ Sram::Sram(const string& name, int line_size, int num_lines, int bit_width,
 
 Sram::~Sram() {
     if (ports)
-        delete ports;
+        delete [] ports;
 
     if (lines)
-        delete lines;
+        delete [] lines;
 }
 
 void Sram::tick() {
@@ -40,6 +40,7 @@ void Sram::tick() {
     for(int i = 0; i < n_rw_ports; ++i) {
         if(ports[i].is_busy){
             cout << "SRAM " << name << " port " << i << " is busy." << endl;
+            ++ports[i].cur_access_cycle;
             if(ports[i].cur_access_cycle >= cycles_per_access) {
                 SramOp *op = ports[i].op;
                 cout << "SRAM " << name << " port " << i;
@@ -55,8 +56,6 @@ void Sram::tick() {
                 ports[i].op = NULL;
 
                 all_ports_busy = false;
-            } else {
-                ++ports[i].cur_access_cycle;
             }
         } else {
             all_ports_busy = false;

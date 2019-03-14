@@ -6,7 +6,7 @@
 
 class NiuDianNao {
 public:
-    NiuDianNao();
+    NiuDianNao(DnnConfig *cfg);
     ~NiuDianNao();
     void run();
 

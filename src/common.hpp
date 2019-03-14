@@ -6,10 +6,11 @@
 #include <sstream>
 #include <cstddef>
 #include <queue>
+#include <deque>
 #include <string>
 #include <assert.h>
 
-typedef int64_t mem_addr;
-typedef int64_t mem_size;
+typedef long long mem_addr;
+typedef long long mem_size;
 
 #endif

@@ -177,7 +177,7 @@ bool OptionRegistry<bool>::fromString(const string str)
    } catch (stringstream::failure &ep) {
       parsed = false;
    }
-   assert(value == 0 or value == 1); // sanity check for boolean options (it can only be 1 or 0)
+   assert(value == 0 || value == 1); // sanity check for boolean options (it can only be 1 or 0)
    m_variable = (value != 0);
    m_isParsed = true; 
    return parsed;
@@ -350,8 +350,6 @@ private:
    typedef map<string, OptionRegistryInterface*> OptionMap;
    OptionMap m_optionMap;
 };
-
-#include "option_parser.h"
 
 option_parser_t option_parser_create() 
 {

@@ -5,25 +5,25 @@
 
 #define MAKE_SRAM_OP(addr, size, is_read) {(addr), (size), (is_read), false}
 
-typedef struct sram_line {
-    bool valid;       // ready to be read
-    bool ready_to_writeback;    // ready to be stored to DRAM
-    bool is_partial_sum; // partial sum, can be overwritten
-    mem_addr addr;    // for sanity check, we shouldn't need to store this in hardware
-} SramLine;
-
-typedef struct sram_port {
-    bool is_busy;
-    int cur_access_cycle;
-    SramOp *op;
-} SramPort;
-
-typedef struct sram_op {
+struct SramOp {
     mem_addr addr;
     mem_size size;
     bool is_read;
     bool is_complete;
-} SramOp;
+};
+
+struct SramLine {
+    bool valid;       // ready to be read
+    bool ready_to_writeback;    // ready to be stored to DRAM
+    bool is_partial_sum; // partial sum, can be overwritten
+    mem_addr addr;    // for sanity check, we shouldn't need to store this in hardware
+};
+
+struct SramPort {
+    bool is_busy;
+    int cur_access_cycle;
+    SramOp *op;
+};
 
 typedef std::queue<SramOp *> SramOpReg;
 

@@ -1,9 +1,9 @@
-#include "functional_unit.h"
+#include "functional_unit.hpp"
 
-void functional_unit::do_op(){
-    m_num_ops++;
+void FunctionalUnit::do_op() {
+    num_ops++;
 }
 
-unsigned functional_unit::get_stats(){
-    return m_num_ops;
+long long FunctionalUnit::get_stats() {
+    return num_ops;
 }

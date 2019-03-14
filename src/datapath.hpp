@@ -3,18 +3,25 @@
 
 #include "dram.hpp"
 #include "sram.hpp"
-#include "pipe_stage.hpp"
+#include "nfu1.hpp"
+#include "nfu2.hpp"
+#include "nfu3.hpp"
 #include "config.hpp"
 
-typedef struct load_store_op {
+struct LoadStoreOp {
     Sram *sram;
     DramOp dram_op;
     SramOp sram_op;
     bool is_load;
     bool is_sent;
-} LoadStoreOp;
+};
 
 class Datapath {
+    enum datapath_mode {
+        nfu2_to_nbout,
+        nfu3_to_nbout
+    };
+
 public:
     Datapath(DnnConfig *cfg);
     
@@ -46,9 +53,12 @@ private:
     Sram *sb;
     Sram *nbout;
     Dram *dram;
-    std::deque<LoadStoreOp> requests;
-    
-    int reg_size;
+    std::deque<LoadStoreOp *> requests;
+
+    datapath_mode mode;
+
+    int64_t tot_op_issue;
+    int64_t tot_op_complete;
 };
 
 #endif

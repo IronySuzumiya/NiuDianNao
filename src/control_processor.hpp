@@ -10,7 +10,8 @@ public:
     ~ControlProcessor() {};
 
     void tick();
-    bool read_instructions(std::istream& is);
+    void read_instruction(std::string s);
+    void read_instructions(std::istream& is);
     
 private:
     bool execute_instruction(ControlInstruction *ci);
