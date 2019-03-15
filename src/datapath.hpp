@@ -12,7 +12,6 @@ struct LoadStoreOp {
     Sram *sram;
     DramOp dram_op;
     SramOp sram_op;
-    bool is_load;
     bool is_sent;
 };
 
@@ -53,7 +52,8 @@ private:
     Sram *sb;
     Sram *nbout;
     Dram *dram;
-    std::deque<LoadStoreOp *> requests;
+    std::deque<LoadStoreOp *> load_requests;
+    std::deque<LoadStoreOp *> store_requests;
 
     datapath_mode mode;
 

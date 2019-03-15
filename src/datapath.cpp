@@ -16,6 +16,9 @@ Datapath::Datapath(DnnConfig *cfg) {
             cfg->sb_num_ports, cfg->sb_access_cycles);
     nbout = new Sram("NBout", cfg->nbout_line_length * bytes, cfg->nbout_num_lines, bit_width,
             cfg->nbout_num_ports, cfg->nbout_access_cycles);
+
+    dram = new Dram("ini/DDR2_micron_16M_8b_x8_sg3E.ini",
+                    "system.ini", "./DRAMSim2/", "ndn", 16384);
     
     pipe_stages[0] = new PipeStageNFU1(&pipe_regs[0], &pipe_regs[1], max_buffer_size, cfg->num_nfu1_pipeline_stages, cfg->num_nfu1_multipliers);
     pipe_stages[1] = new PipeStageNFU2(&pipe_regs[1], &pipe_regs[2], max_buffer_size, cfg->num_nfu2_pipeline_stages, cfg->num_nfu2_adders, cfg->num_nfu2_shifters, cfg->num_nfu2_max);
@@ -42,58 +45,84 @@ Datapath::~Datapath() {
     }
     delete [] pipe_stages;
     delete [] pipe_regs;
-    delete [] nbin;
-    delete [] sb;
-    delete [] nbout;
+    delete nbin;
+    delete sb;
+    delete nbout;
 }
 
 void Datapath::tick() {
+    dram->tick();
+
+    std::deque<LoadStoreOp *>::iterator it;
+    for(it = load_requests.begin(); it != load_requests.end(); ) {
+        if(!(*it)->is_sent) {
+            if((*it)->dram_op.is_complete) {
+                (*it)->sram->push_request(&(*it)->sram_op);
+                (*it)->is_sent = true;
+            }
+            ++it;
+        } else if((*it)->sram_op.is_complete) {
+            delete *it;
+            it = load_requests.erase(it);
+        } else {
+            ++it;
+        }
+    }
+
+    for(it = store_requests.begin(); it != store_requests.end(); ) {
+        if(!(*it)->is_sent) {
+            if((*it)->sram_op.is_complete) {
+                dram->push_request(&(*it)->dram_op);
+                (*it)->is_sent = true;
+            }
+            ++it;
+        } else if((*it)->dram_op.is_complete) {
+            delete *it;
+            it = store_requests.erase(it);
+        } else {
+            ++it;
+        }
+    }
+
     for(PipeOpReg::iterator it = pipe_regs[0].begin(); it != pipe_regs[0].end(); ++it) {
-        if((*it)->data_is_ready()) {
-            assert((*it)->is_pending);
-            (*it)->is_pending = false;
-        } else if(!(*it)->is_pending) {
+        if(!(*it)->is_pending) {
             read_nbin(&(*it)->nbin_sram_op);
             read_sb(&(*it)->sb_sram_op);
             (*it)->is_pending = true;
         }
     }
 
-    for(int i = 0; i < 3; ++i) {
+    nbin->tick();
+    sb->tick();
+
+    for(PipeOpReg::iterator it = pipe_regs[0].begin(); it != pipe_regs[0].end(); ++it) {
+        if((*it)->data_is_ready()) {
+            assert((*it)->is_pending);
+            (*it)->is_pending = false;
+        }
+    }
+
+    for(int i = 2; i >= 0; --i) {
         pipe_stages[i]->tick();
     }
 
     int k = mode == nfu2_to_nbout ? 2 : 3;
-    for(PipeOpReg::iterator it = pipe_regs[k].begin(); it != pipe_regs[k].end(); ++it) {
+    for(PipeOpReg::iterator it = pipe_regs[k].begin(); it != pipe_regs[k].end(); ) {
         if((*it)->write_is_complete()) {
             assert((*it)->is_pending);
             delete *it;
-            pipe_regs[k].erase(it);
+            it = pipe_regs[k].erase(it);
+            ++tot_op_complete;
         } else if(!(*it)->is_pending) {
             write_nbout(&(*it)->nbout_sram_op);
             (*it)->is_pending = true;
+            ++it;
+        } else {
+            ++it;
         }
     }
-    
-    std::deque<LoadStoreOp *>::iterator it;
-    for(it = requests.begin(); it != requests.end(); ++it) {
-        if(!(*it)->is_sent) {
-            if((*it)->is_load) {
-                if((*it)->dram_op.is_complete) {
-                    (*it)->sram->push_request(&(*it)->sram_op);
-                    (*it)->is_sent = true;
-                }
-            } else {
-                if((*it)->sram_op.is_complete) {
-                    dram->push_request(&(*it)->dram_op);
-                    (*it)->is_sent = true;
-                }
-            }
-        } else if((*it)->is_load? (*it)->sram_op.is_complete : (*it)->dram_op.is_complete) {
-            delete *it;
-            requests.erase(it);
-        }
-    }
+
+    nbout->tick();
 }
 
 void Datapath::print_stats() {
@@ -109,23 +138,32 @@ void Datapath::print_pipeline() {
         cout << "NFU" << i + 1 << ": ";
         pipe_stages[i]->print();
     }
-    cout << "Active Nbout Write: " << pipe_regs[k].front()->serial_num << endl;
+    if(pipe_regs[k].empty()) {
+        cout << "No active NBout write." << endl;
+    } else {
+        cout << "Active NBout write: | ";
+        for(PipeOpReg::iterator it = pipe_regs[k].begin(); it != pipe_regs[k].end(); ++it) {
+            cout << (*it)->serial_num << " | ";
+        }
+        cout << endl;
+    }
 }
 
 bool Datapath::is_ready() {
-    return requests.empty();
+    return load_requests.empty();
 }
 
 void Datapath::push_pipe_op(PipeOp *op) {
     pipe_regs[0].push_back(op);
+    ++tot_op_issue;
 }
 
 void Datapath::load_nbin(mem_addr dram_addr, mem_addr sram_addr, mem_size size) {
     LoadStoreOp *op = new LoadStoreOp({nbin,
         MAKE_DRAM_OP(dram_addr, size, true),
         MAKE_SRAM_OP(sram_addr, size, false),
-        true, false});
-    requests.push_back(op);
+        false});
+    load_requests.push_back(op);
     dram->push_request(&op->dram_op);
 }
 
@@ -133,8 +171,8 @@ void Datapath::load_sb(mem_addr dram_addr, mem_addr sram_addr, mem_size size) {
     LoadStoreOp *op = new LoadStoreOp({sb,
         MAKE_DRAM_OP(dram_addr, size, true),
         MAKE_SRAM_OP(sram_addr, size, false),
-        true, false});
-    requests.push_back(op);
+        false});
+    load_requests.push_back(op);
     dram->push_request(&op->dram_op);
 }
 
@@ -142,8 +180,8 @@ void Datapath::store_nbout(mem_addr dram_addr, mem_addr sram_addr, mem_size size
     LoadStoreOp *op = new LoadStoreOp({nbout,
         MAKE_DRAM_OP(dram_addr, size, false),
         MAKE_SRAM_OP(sram_addr, size, true),
-        false, false});
-    requests.push_back(op);
+        false});
+    store_requests.push_back(op);
     nbout->push_request(&op->sram_op);
 }
 

@@ -10,19 +10,19 @@
 -sb_line_length 256
 -sb_num_lines 64
 -sb_access_cycles 1
--sb_num_ports 1
+-sb_num_ports 2
 
 # NBin
 -nbin_line_length 16
 -nbin_num_lines 64
 -nbin_access_cycles 1
--nbin_num_ports 1
+-nbin_num_ports 2
 
 # NBout
 -nbout_line_length 16
 -nbout_num_lines 64
 -nbout_access_cycles 1
--nbout_num_ports 1
+-nbout_num_ports 2
 
 # NFU-1
 -num_nfu1_pipeline_stages 3

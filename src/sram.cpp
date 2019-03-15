@@ -131,12 +131,12 @@ void Sram::push_request(SramOp *op) {
 }
 
 bool Sram::read(int port, SramOp *op) {
-    if(!check_addr(op->addr) || !check_valid(op->addr))
-        return false;
+    //if(!check_addr(op->addr) || !check_valid(op->addr))
+    //    return false;
     ++n_reads;
 
     std::cout << "SRAM " << name << " port " << port << " READ is sent: ";
-    cout << " ADDR = " << op->addr << " SIZE = " << op->size << "." << endl;
+    cout << " ADDR = " << op->addr << ", SIZE = " << op->size << "." << endl;
 
     ports[port].is_busy = true;
     ports[port].cur_access_cycle = 0;
@@ -146,8 +146,8 @@ bool Sram::read(int port, SramOp *op) {
 }
 
 bool Sram::write(int port, SramOp *op) {
-    if(!check_addr(op->addr) || !check_write(op->addr))
-        return false;
+    //if(!check_addr(op->addr) || !check_write(op->addr))
+    //    return false;
     ++n_writes;
 
     std::cout << "SRAM " << name << " port " << port << " WRITE is sent: ";

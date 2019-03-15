@@ -21,6 +21,8 @@ PipeOp::PipeOp(mem_addr nbin_addr, mem_size nbin_size,
     nbout_sram_op.is_complete = false;
 
     serial_num = global_serial_num++;
+
+    is_pending = false;
 }
 
 bool PipeOp::data_is_ready() {
@@ -63,11 +65,13 @@ void PipeStage::tick() {
         }
         pipeline[0] = NULL;
         PipeOpReg::iterator it;
-        for(it = reg_in->begin(); it != reg_in->end(); ++it) {
+        for(it = reg_in->begin(); it != reg_in->end(); ) {
             if((*it)->data_is_ready()) {
                 assert(!pipeline[0]);
                 pipeline[0] = (*it);
-                reg_in->erase(it);
+                it = reg_in->erase(it);
+            } else {
+                ++it;
             }
         }
     } else {
@@ -79,7 +83,11 @@ void PipeStage::print() {
     if(is_pipe_op_reg_empty(reg_in)) {
         cout << "Reg_in is empty." << endl;
     } else {
-        cout << "Next OP: " << reg_in->front()->serial_num << endl;
+        cout << "Reg_in: | ";
+        for(PipeOpReg::reverse_iterator it = reg_in->rbegin(); it != reg_in->rend(); ++it) {
+            cout << (*it)->serial_num << " | ";
+        }
+        cout << endl;
     }
 
     cout << "Pipeline: | ";

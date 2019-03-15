@@ -108,8 +108,8 @@ bool ControlProcessor::execute_instruction(ControlInstruction *ci) {
                 int nbout_addr  = ci->nbout_address   + nbout_index   * cfg->nbout_line_length   * data_size;
 
                 cout << "Do Op: NBIN ADDR = " << nbin_addr
-                    << " SB ADDR = " << sb_addr
-                    << " NBOUT ADDR = " << nbout_addr << endl;
+                    << ", SB ADDR = " << sb_addr
+                    << ", NBOUT ADDR = " << nbout_addr << endl;
 
                 // not right
                 PipeOp *op = new PipeOp(nbin_addr, 1, sb_addr, 1, nbout_addr, 1);
