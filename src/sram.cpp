@@ -151,7 +151,7 @@ bool Sram::write(int port, SramOp *op) {
     ++n_writes;
 
     std::cout << "SRAM " << name << " port " << port << " WRITE is sent: ";
-    cout << " ADDR = " << op->addr << " SIZE = " << op->size << "." << endl;
+    cout << " ADDR = " << op->addr << ", SIZE = " << op->size << "." << endl;
 
     ports[port].is_busy = true;
     ports[port].cur_access_cycle = 0;

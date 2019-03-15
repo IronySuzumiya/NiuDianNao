@@ -102,11 +102,12 @@ void Datapath::tick() {
         }
     }
 
-    for(int i = 2; i >= 0; --i) {
+    int k = mode == nfu2_to_nbout ? 2 : 3;
+
+    for(int i = k - 1; i >= 0; --i) {
         pipe_stages[i]->tick();
     }
-
-    int k = mode == nfu2_to_nbout ? 2 : 3;
+    
     for(PipeOpReg::iterator it = pipe_regs[k].begin(); it != pipe_regs[k].end(); ) {
         if((*it)->write_is_complete()) {
             assert((*it)->is_pending);
