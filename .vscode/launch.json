@@ -5,17 +5,24 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(gdb) Launch",
+            "name": "NiuDianNao",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceRoot}/ndn",
+            "program": "ndn",
             "args": [],
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
+            "stopAtEntry": true,
+            "cwd": "/mnt/d/Code/Architecture/NiuDianNao",
             "environment": [],
             "externalConsole": true,
-            "preLaunchTask": "build",
-            "MIMode": "gdb",
+            "pipeTransport": {
+                "debuggerPath": "/usr/bin/gdb",
+                "pipeProgram": "${env:windir}\\sysnative\\bash.exe",
+                "pipeArgs": ["-c"],
+                "pipeCwd": ""
+            },
+            "sourceFileMap": {
+                "/mnt/d/Code/Architecture/NiuDianNao": "${workspaceFolder}"
+            },
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",
