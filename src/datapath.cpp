@@ -2,9 +2,7 @@
 
 using namespace std;
 
-struct PipeOpReg {
-    
-}
+
 
 Datapath::Datapath(DnnConfig *cfg) {
     unsigned max_buffer_size = cfg->max_buffer_size;
