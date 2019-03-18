@@ -15,6 +15,14 @@ struct LoadStoreOp {
     bool is_sent;
 };
 
+struct PipeOpReg {
+    // TODO: this struct holds a deque to store PipeOps, 
+    //       should provide interfaces for pushing PipeOps in,
+    //       poping PipeOps out, checking the size of the deque,
+    //       and also reading data from SRAM corresponding to
+    //       the information held by the PipeOp.
+};
+
 class Datapath {
     enum datapath_mode {
         nfu2_to_nbout,
@@ -34,17 +42,18 @@ public:
     bool is_ready();
 
     void push_pipe_op(PipeOp *op);
+
     void load_nbin(mem_addr dram_addr, mem_addr sram_addr, mem_size size);
     void load_sb(mem_addr dram_addr, mem_addr sram_addr, mem_size size);
     void store_nbout(mem_addr dram_addr, mem_addr sram_addr, mem_size size);
-
-private:
-    DnnConfig *cfg;
 
     void read_nbin(SramOp *op);
     void read_sb(SramOp *op);
     void read_nbout(SramOp *op);
     void write_nbout(SramOp *op);
+
+private:
+    DnnConfig *cfg;
     
     PipeStage **pipe_stages;
     PipeOpReg *pipe_regs;

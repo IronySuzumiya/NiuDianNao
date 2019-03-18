@@ -23,6 +23,8 @@ PipeStageNFU2::PipeStageNFU2(PipeOpReg *reg_in, PipeOpReg *reg_out,
     for(unsigned i = 0; i < num_max; ++i){
         max[i] = new FunctionalUnit();
     }
+
+    needs_data = true;
 }
 
 PipeStageNFU2::~PipeStageNFU2() {
@@ -52,4 +54,12 @@ void PipeStageNFU2::do_op() {
     for(unsigned i = 0; i < num_max; i++) {
         max[i]->do_op();
     }
+}
+
+bool PipeStageNFU2::is_ready_to_fetch(PipeOp *op) {
+    return op->is_ready_to_nfu2();
+}
+
+void PipeStageNFU2::read_data(PipeOp *op) {
+    reg_in->read_nbout(&op->nbout_read_op);
 }

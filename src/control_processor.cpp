@@ -103,16 +103,15 @@ bool ControlProcessor::execute_instruction(ControlInstruction *ci) {
                 int nbin_index          = sb_index / num_output_lines;
                 int nbout_index         = sb_index % num_output_lines;
 
-                int sb_addr     = ci->sb_address      + sb_index      * cfg->sb_line_length      * data_size;
-                int nbin_addr   = ci->nbin_address    + nbin_index    * cfg->nbin_line_length    * data_size;
-                int nbout_addr  = ci->nbout_address   + nbout_index   * cfg->nbout_line_length   * data_size;
+                int sb_addr     = sb_index      * cfg->sb_line_length      * data_size;
+                int nbin_addr   = nbin_index    * cfg->nbin_line_length    * data_size;
+                int nbout_addr  = nbout_index   * cfg->nbout_line_length   * data_size;
 
-                cout << "Do Op: NBIN ADDR = " << nbin_addr
+                cout << "Next Op: NBIN ADDR = " << nbin_addr
                     << ", SB ADDR = " << sb_addr
                     << ", NBOUT ADDR = " << nbout_addr << endl;
 
-                // not right
-                PipeOp *op = new PipeOp(nbin_addr, 1, sb_addr, 1, nbout_addr, 1);
+                PipeOp *op = new PipeOp(nbin_addr, 16 * 2, sb_addr, 256 * 2, nbout_addr, 16 * 2);
                 dp->push_pipe_op(op);
                 ++sb_index;
 

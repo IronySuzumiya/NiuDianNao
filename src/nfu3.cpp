@@ -17,6 +17,8 @@ PipeStageNFU3::PipeStageNFU3(PipeOpReg *reg_in, PipeOpReg *reg_out,
     for(unsigned i = 0; i < num_adders; ++i){
         adders[i] = new FunctionalUnit();
     }
+
+    needs_data = false;
 }
 
 PipeStageNFU3::~PipeStageNFU3() {
@@ -38,4 +40,13 @@ void PipeStageNFU3::do_op() {
     for(unsigned i = 0; i < num_adders; i++) {
         adders[i]->do_op();
     }
+}
+
+bool PipeStageNFU3::is_ready_to_fetch(PipeOp *op) {
+    cout << "Error: Interface not Implemented" << endl;
+    return false;
+}
+
+void PipeStageNFU3::read_data(PipeOp *op) {
+    cout << "Error: Interface not Implemented" << endl;
 }
