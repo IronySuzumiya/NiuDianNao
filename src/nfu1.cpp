@@ -11,6 +11,8 @@ PipeStageNFU1::PipeStageNFU1(PipeOpReg *reg_in, PipeOpReg *reg_out,
     for(unsigned i = 0; i < num_multipliers; ++i){
         multipliers[i] = new FunctionalUnit();
     }
+
+    needs_data = true;
 }
 
 PipeStageNFU1::~PipeStageNFU1() {
@@ -24,4 +26,13 @@ void PipeStageNFU1::do_op() {
     for(unsigned i = 0; i < num_multipliers; i++) {
         multipliers[i]->do_op();
     }
+}
+
+bool PipeStageNFU1::is_ready_to_fetch(PipeOp *op) {
+    return op->is_ready_to_nfu1();
+}
+
+void PipeStageNFU1::read_data(PipeOp *op) {
+    reg_in->read_nbin(&op->nbin_read_op);
+    reg_in->read_sb(&op->sb_read_op);
 }

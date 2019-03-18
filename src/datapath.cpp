@@ -2,6 +2,8 @@
 
 using namespace std;
 
+
+
 Datapath::Datapath(DnnConfig *cfg) {
     unsigned max_buffer_size = cfg->max_buffer_size;
     unsigned bit_width = cfg->bit_width;
@@ -20,9 +22,9 @@ Datapath::Datapath(DnnConfig *cfg) {
     dram = new Dram("ini/DDR2_micron_16M_8b_x8_sg3E.ini",
                     "system.ini", "./DRAMSim2/", "ndn", 16384);
     
-    pipe_stages[0] = new PipeStageNFU1(&pipe_regs[0], &pipe_regs[1], max_buffer_size, cfg->num_nfu1_pipeline_stages, cfg->num_nfu1_multipliers);
-    pipe_stages[1] = new PipeStageNFU2(&pipe_regs[1], &pipe_regs[2], max_buffer_size, cfg->num_nfu2_pipeline_stages, cfg->num_nfu2_adders, cfg->num_nfu2_shifters, cfg->num_nfu2_max);
-    pipe_stages[2] = new PipeStageNFU3(&pipe_regs[2], &pipe_regs[3], max_buffer_size, cfg->num_nfu3_pipeline_stages, cfg->num_nfu3_multipliers, cfg->num_nfu3_adders);
+    pipe_stages[0] = new PipeStageNFU1(this, &pipe_regs[0], &pipe_regs[1], max_buffer_size, cfg->num_nfu1_pipeline_stages, cfg->num_nfu1_multipliers);
+    pipe_stages[1] = new PipeStageNFU2(this, &pipe_regs[1], &pipe_regs[2], max_buffer_size, cfg->num_nfu2_pipeline_stages, cfg->num_nfu2_adders, cfg->num_nfu2_shifters, cfg->num_nfu2_max);
+    pipe_stages[2] = new PipeStageNFU3(this, &pipe_regs[2], &pipe_regs[3], max_buffer_size, cfg->num_nfu3_pipeline_stages, cfg->num_nfu3_multipliers, cfg->num_nfu3_adders);
 
     tot_op_issue = 0;
     tot_op_complete = 0;
@@ -84,23 +86,8 @@ void Datapath::tick() {
         }
     }
 
-    for(PipeOpReg::iterator it = pipe_regs[0].begin(); it != pipe_regs[0].end(); ++it) {
-        if(!(*it)->is_pending) {
-            read_nbin(&(*it)->nbin_sram_op);
-            read_sb(&(*it)->sb_sram_op);
-            (*it)->is_pending = true;
-        }
-    }
-
     nbin->tick();
     sb->tick();
-
-    for(PipeOpReg::iterator it = pipe_regs[0].begin(); it != pipe_regs[0].end(); ++it) {
-        if((*it)->data_is_ready()) {
-            assert((*it)->is_pending);
-            (*it)->is_pending = false;
-        }
-    }
 
     int k = mode == nfu2_to_nbout ? 2 : 3;
 
@@ -109,13 +96,13 @@ void Datapath::tick() {
     }
     
     for(PipeOpReg::iterator it = pipe_regs[k].begin(); it != pipe_regs[k].end(); ) {
-        if((*it)->write_is_complete()) {
+        if((*it)->is_complete()) {
             assert((*it)->is_pending);
             delete *it;
             it = pipe_regs[k].erase(it);
             ++tot_op_complete;
         } else if(!(*it)->is_pending) {
-            write_nbout(&(*it)->nbout_sram_op);
+            write_nbout(&(*it)->nbout_write_op);
             (*it)->is_pending = true;
             ++it;
         } else {

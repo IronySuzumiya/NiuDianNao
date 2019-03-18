@@ -6,12 +6,14 @@
 
 class PipeStageNFU1 : public PipeStage {
 public:
-    PipeStageNFU1(PipeOpReg *reg_in, PipeOpReg *reg_out, int queue_size, int n_stages, unsigned num_multipliers);
+    PipeStageNFU1(Datapath *dp, PipeOpReg *reg_in, PipeOpReg *reg_out, int queue_size, int n_stages, unsigned num_multipliers);
     ~PipeStageNFU1();
 
-    void do_op();
-
 private:
+    void do_op();
+    bool is_ready_to_fetch(PipeOp *op);
+    void read_data(PipeOp *op);
+
     unsigned num_multipliers;
     FunctionalUnit **multipliers;
 };

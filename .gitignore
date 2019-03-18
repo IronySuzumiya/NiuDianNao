@@ -7,4 +7,5 @@
 *.rep
 *.out
 *WORK*
-
+/.vscode
+/obj

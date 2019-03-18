@@ -10,6 +10,8 @@
 #include <string>
 #include <assert.h>
 
+#define DEBUG 1
+
 typedef long long mem_addr;
 typedef long long mem_size;
 

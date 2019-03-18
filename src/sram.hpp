@@ -14,9 +14,7 @@ struct SramOp {
 
 struct SramLine {
     bool valid;       // ready to be read
-    bool ready_to_writeback;    // ready to be stored to DRAM
     bool is_partial_sum; // partial sum, can be overwritten
-    mem_addr addr;    // for sanity check, we shouldn't need to store this in hardware
 };
 
 struct SramPort {
@@ -34,9 +32,6 @@ public:
     ~Sram();
     
     void tick();
-    bool is_busy();
-    void set_valid();
-    void reset_valid();
 
     void push_request(SramOp *op);
 
@@ -44,9 +39,18 @@ private:
     bool read(int port, SramOp *op);
     bool write(int port, SramOp *op);
 
+    int addr_to_line_index(mem_addr addr);
+    int size_to_line_num(mem_size size);
+
     bool check_addr(mem_addr addr);
-    bool check_valid(mem_addr addr);
-    bool check_write(mem_addr addr);
+    bool check_size(mem_size size);
+
+    bool check_valid(mem_addr addr, mem_size size);
+    bool check_read(mem_addr addr, mem_size size);
+    bool check_write(mem_addr addr, mem_size size);
+
+    void set_valid(mem_addr addr, mem_size size);
+    void reset_valid(mem_addr addr, mem_size size);
 
     SramOpReg requests;
 
