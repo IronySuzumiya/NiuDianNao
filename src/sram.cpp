@@ -44,10 +44,14 @@ void Sram::tick() {
             if(ports[i].cur_access_cycle >= cycles_per_access) {
                 SramOp *op = ports[i].op;
                 cout << "SRAM " << name << " port " << i;
-                if(op->is_read) {
-                    cout << " READ";
-                } else {
+                if(name == "NBout") {
                     cout << " WRITE";
+                } else {
+                    if(op->is_read) {
+                        cout << " READ";
+                    } else {
+                        cout << " WRITE";
+                    }
                 }
                 cout << " is complete: ";
                 cout << " ADDR = " << op->addr << ", SIZE = " << op->size << "." << endl;
@@ -68,10 +72,14 @@ void Sram::tick() {
                 if(!ports[i].is_busy) {
                     SramOp *op = requests.front();
                     requests.pop();
-                    if(op->is_read) {
-                        assert(read(i, op));
-                    } else {
+                    if (name == "NBout") {
                         assert(write(i, op));
+                    } else {
+                        if(op->is_read) {
+                            assert(read(i, op));
+                        } else {
+                            assert(write(i, op));
+                        }
                     }
                     if(requests.empty())
                         break;
