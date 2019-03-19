@@ -7,7 +7,7 @@ void ControlProcessor::tick() {
         ControlInstruction *ci = &ciq.front();
         if(execute_instruction(ci)) {
             cout << "Control Instruction is Done:" << endl;
-            cout << ci << endl;
+            cout << *ci << endl;
             ciq.pop();
         }
     }
@@ -76,7 +76,7 @@ bool ControlProcessor::execute_instruction(ControlInstruction *ci) {
         assert(ci->nfu_nfu3_op == ControlInstruction::SIGMOID);
 
         cout << "Current Control Instruction:" << endl;
-        cout << ci << endl;
+        cout << *ci << endl;
     }
 
     switch(ci->state){
