@@ -8,7 +8,8 @@
 #include <queue>
 #include <deque>
 #include <string>
-#include <assert.h>
+#include <cassert>
+#include <cstdlib>
 
 #define DEBUG 1
 

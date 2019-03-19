@@ -6,13 +6,22 @@
 
 class PipeStageNFU2 : public PipeStage {
 public:
-    PipeStageNFU2(Datapath *dp, PipeOpReg *reg_in, PipeOpReg *reg_out, int queue_size, int n_stages, unsigned num_adders, unsigned num_shifters, unsigned num_max);
+    PipeStageNFU2(PipeOpReg *reg_in, PipeOpReg *reg_out, int queue_size, int n_stages, unsigned num_adders, unsigned num_shifters, unsigned num_max, Sram *nbout);
     ~PipeStageNFU2();
+
+    void to_nbout();
+    void to_nfu3();
+
+    void tick();
+    void print();
 
 private:
     void do_op();
     bool is_ready_to_fetch(PipeOp *op);
-    void read_data(PipeOp *op);
+    void preprocess_op(PipeOp *op);
+
+    void read_nbout(SramOp *op);
+    void write_nbout(SramOp *op);
 
     unsigned num_adders;
     unsigned num_shifters;
@@ -20,6 +29,10 @@ private:
     FunctionalUnit **adders;
     FunctionalUnit **shifters;
     FunctionalUnit **max;
+
+    bool is_to_nbout;
+
+    Sram *nbout;
 };
 
 #endif

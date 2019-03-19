@@ -5,6 +5,8 @@
 #include "../DRAMSim2/DRAMSim.h"
 
 #define MAKE_DRAM_OP(addr, size, is_read) {(addr), (size), (is_read), false}
+#define MAKE_DRAM_READ(addr, size) MAKE_DRAM_OP((addr), (size), true)
+#define MAKE_DRAM_WRITE(addr, size) MAKE_DRAM_OP((addr), (size), false)
 
 struct DramOp {
     mem_addr addr;

@@ -15,20 +15,7 @@ struct LoadStoreOp {
     bool is_sent;
 };
 
-struct PipeOpReg {
-    // TODO: this struct holds a deque to store PipeOps, 
-    //       should provide interfaces for pushing PipeOps in,
-    //       poping PipeOps out, checking the size of the deque,
-    //       and also reading data from SRAM corresponding to
-    //       the information held by the PipeOp.
-};
-
 class Datapath {
-    enum datapath_mode {
-        nfu2_to_nbout,
-        nfu3_to_nbout
-    };
-
 public:
     Datapath(DnnConfig *cfg);
     
@@ -36,7 +23,6 @@ public:
 
     void tick();
 
-    void print_stats();
     void print_pipeline();
 
     bool is_ready();
@@ -47,15 +33,16 @@ public:
     void load_sb(mem_addr dram_addr, mem_addr sram_addr, mem_size size);
     void store_nbout(mem_addr dram_addr, mem_addr sram_addr, mem_size size);
 
-    void read_nbin(SramOp *op);
-    void read_sb(SramOp *op);
-    void read_nbout(SramOp *op);
-    void write_nbout(SramOp *op);
+    void activate_nfu3();
+    void deactivate_nfu3();
 
 private:
     DnnConfig *cfg;
     
     PipeStage **pipe_stages;
+    PipeStageNFU1 *nfu1;
+    PipeStageNFU2 *nfu2;
+    PipeStageNFU3 *nfu3;
     PipeOpReg *pipe_regs;
     Sram *nbin;
     Sram *sb;
@@ -63,8 +50,6 @@ private:
     Dram *dram;
     std::deque<LoadStoreOp *> load_requests;
     std::deque<LoadStoreOp *> store_requests;
-
-    datapath_mode mode;
 
     int64_t tot_op_issue;
     int64_t tot_op_complete;

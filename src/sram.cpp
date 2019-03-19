@@ -109,11 +109,11 @@ int Sram::size_to_line_num(mem_size size) {
 }
 
 bool Sram::check_addr(mem_addr addr) {
-    return addr % line_size;
+    return !(addr % line_size);
 }
 
 bool Sram::check_size(mem_size size) {
-    return size % line_size;
+    return !(size % line_size);
 }
 
 bool Sram::check_valid(mem_addr addr, mem_size size) {
@@ -171,8 +171,8 @@ void Sram::reset_valid(mem_addr addr, mem_size size) {
 }
 
 bool Sram::read(int port, SramOp *op) {
-    mem_addr addr;
-    mem_size size;
+    mem_addr addr = op->addr;
+    mem_size size = op->size;
 
     if(!check_addr(addr) || !check_size(size) || !check_read(addr, size)) {
         return false;
@@ -199,8 +199,8 @@ bool Sram::read(int port, SramOp *op) {
 }
 
 bool Sram::write(int port, SramOp *op) {
-    mem_addr addr;
-    mem_size size;
+    mem_addr addr = op->addr;
+    mem_size size = op->size;
 
     if(!check_addr(addr) || !check_size(size) || !check_write(addr, size)) {
         return false;

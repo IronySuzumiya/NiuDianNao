@@ -2,8 +2,6 @@
 
 using namespace std;
 
-
-
 Datapath::Datapath(DnnConfig *cfg) {
     unsigned max_buffer_size = cfg->max_buffer_size;
     unsigned bit_width = cfg->bit_width;
@@ -22,14 +20,16 @@ Datapath::Datapath(DnnConfig *cfg) {
     dram = new Dram("ini/DDR2_micron_16M_8b_x8_sg3E.ini",
                     "system.ini", "./DRAMSim2/", "ndn", 16384);
     
-    pipe_stages[0] = new PipeStageNFU1(this, &pipe_regs[0], &pipe_regs[1], max_buffer_size, cfg->num_nfu1_pipeline_stages, cfg->num_nfu1_multipliers);
-    pipe_stages[1] = new PipeStageNFU2(this, &pipe_regs[1], &pipe_regs[2], max_buffer_size, cfg->num_nfu2_pipeline_stages, cfg->num_nfu2_adders, cfg->num_nfu2_shifters, cfg->num_nfu2_max);
-    pipe_stages[2] = new PipeStageNFU3(this, &pipe_regs[2], &pipe_regs[3], max_buffer_size, cfg->num_nfu3_pipeline_stages, cfg->num_nfu3_multipliers, cfg->num_nfu3_adders);
+    nfu1 = new PipeStageNFU1(&pipe_regs[0], &pipe_regs[1], max_buffer_size, cfg->num_nfu1_pipeline_stages,
+                            cfg->num_nfu1_multipliers, nbin, sb);
+    nfu2 = new PipeStageNFU2(&pipe_regs[1], &pipe_regs[2], max_buffer_size, cfg->num_nfu2_pipeline_stages,
+                            cfg->num_nfu2_adders, cfg->num_nfu2_shifters, cfg->num_nfu2_max, nbout);
+    nfu3 = new PipeStageNFU3(&pipe_regs[2], &pipe_regs[3], max_buffer_size, cfg->num_nfu3_pipeline_stages,
+                            cfg->num_nfu3_multipliers, cfg->num_nfu3_adders, nbout);
 
-    tot_op_issue = 0;
-    tot_op_complete = 0;
-
-    mode = nfu2_to_nbout;
+    pipe_stages[0] = nfu1;
+    pipe_stages[1] = nfu2;
+    pipe_stages[2] = nfu3;
 }
 
 Datapath::~Datapath() {
@@ -42,14 +42,15 @@ Datapath::~Datapath() {
             pipe_regs[i].clear();
         }
     }
-    for(int i = 0; i < 3; ++i) {
-        delete pipe_stages[i];
-    }
     delete [] pipe_stages;
+    delete nfu1;
+    delete nfu2;
+    delete nfu3;
     delete [] pipe_regs;
     delete nbin;
     delete sb;
     delete nbout;
+    delete dram;
 }
 
 void Datapath::tick() {
@@ -89,51 +90,16 @@ void Datapath::tick() {
     nbin->tick();
     sb->tick();
 
-    int k = mode == nfu2_to_nbout ? 2 : 3;
-
-    for(int i = k - 1; i >= 0; --i) {
+    for(int i = 2; i >= 0; --i) {
         pipe_stages[i]->tick();
-    }
-    
-    for(PipeOpReg::iterator it = pipe_regs[k].begin(); it != pipe_regs[k].end(); ) {
-        if((*it)->is_complete()) {
-            assert((*it)->is_pending);
-            delete *it;
-            it = pipe_regs[k].erase(it);
-            ++tot_op_complete;
-        } else if(!(*it)->is_pending) {
-            write_nbout(&(*it)->nbout_write_op);
-            (*it)->is_pending = true;
-            ++it;
-        } else {
-            ++it;
-        }
     }
 
     nbout->tick();
 }
 
-void Datapath::print_stats() {
-    cout << "=============Stats=============" << endl;
-    cout << "Total operations issued: " << tot_op_issue << endl;
-    cout << "Total operations completed: " << tot_op_complete << endl;
-    cout << "===============================" << endl;
-}
-
 void Datapath::print_pipeline() {
-    int k = mode == nfu2_to_nbout ? 2 : 3;
-    for(int i = 0; i < k; ++i) {
-        cout << "NFU" << i + 1 << ": ";
+    for(int i = 0; i < 3; ++i) {
         pipe_stages[i]->print();
-    }
-    if(pipe_regs[k].empty()) {
-        cout << "No active NBout write." << endl;
-    } else {
-        cout << "Active NBout write: | ";
-        for(PipeOpReg::iterator it = pipe_regs[k].begin(); it != pipe_regs[k].end(); ++it) {
-            cout << (*it)->serial_num << " | ";
-        }
-        cout << endl;
     }
 }
 
@@ -148,8 +114,8 @@ void Datapath::push_pipe_op(PipeOp *op) {
 
 void Datapath::load_nbin(mem_addr dram_addr, mem_addr sram_addr, mem_size size) {
     LoadStoreOp *op = new LoadStoreOp({nbin,
-        MAKE_DRAM_OP(dram_addr, size, true),
-        MAKE_SRAM_OP(sram_addr, size, false),
+        MAKE_DRAM_READ(dram_addr, size),
+        MAKE_SRAM_WRITE(sram_addr, size),
         false});
     load_requests.push_back(op);
     dram->push_request(&op->dram_op);
@@ -157,8 +123,8 @@ void Datapath::load_nbin(mem_addr dram_addr, mem_addr sram_addr, mem_size size) 
 
 void Datapath::load_sb(mem_addr dram_addr, mem_addr sram_addr, mem_size size) {
     LoadStoreOp *op = new LoadStoreOp({sb,
-        MAKE_DRAM_OP(dram_addr, size, true),
-        MAKE_SRAM_OP(sram_addr, size, false),
+        MAKE_DRAM_READ(dram_addr, size),
+        MAKE_SRAM_WRITE(sram_addr, size),
         false});
     load_requests.push_back(op);
     dram->push_request(&op->dram_op);
@@ -166,25 +132,19 @@ void Datapath::load_sb(mem_addr dram_addr, mem_addr sram_addr, mem_size size) {
 
 void Datapath::store_nbout(mem_addr dram_addr, mem_addr sram_addr, mem_size size) {
     LoadStoreOp *op = new LoadStoreOp({nbout,
-        MAKE_DRAM_OP(dram_addr, size, false),
-        MAKE_SRAM_OP(sram_addr, size, true),
+        MAKE_DRAM_WRITE(dram_addr, size),
+        MAKE_SRAM_READ(sram_addr, size),
         false});
     store_requests.push_back(op);
     nbout->push_request(&op->sram_op);
 }
 
-void Datapath::read_nbin(SramOp *op) {
-    nbin->push_request(op);
+void Datapath::activate_nfu3() {
+    nfu3->activate();
+    nfu2->to_nfu3();
 }
 
-void Datapath::read_sb(SramOp *op) {
-    sb->push_request(op);
-}
-
-void Datapath::read_nbout(SramOp *op) {
-    nbout->push_request(op);
-}
-
-void Datapath::write_nbout(SramOp *op) {
-    nbout->push_request(op);
+void Datapath::deactivate_nfu3() {
+    nfu3->deactivate();
+    nfu2->to_nbout();
 }

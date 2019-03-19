@@ -71,10 +71,10 @@ bool ControlProcessor::execute_instruction(ControlInstruction *ci) {
             // customize the datapath
         }
         if(ci->nfu_nfu2_out == ControlInstruction::NBOUT) {
-            // customize the datapath
+            dp->deactivate_nfu3();
         } else {
             assert(ci->nfu_nfu2_out == ControlInstruction::NFU3);
-            // customize the datapath
+            dp->activate_nfu3();
         }
         assert(ci->nfu_nfu3_op == ControlInstruction::SIGMOID);
     }
