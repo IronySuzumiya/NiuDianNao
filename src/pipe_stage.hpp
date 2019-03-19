@@ -11,6 +11,8 @@ public:
     virtual void tick();
     virtual void print();
 
+    bool is_pipe_line_empty();
+
 protected:
     virtual void do_op() = 0;
     virtual bool is_ready_to_fetch(PipeOp *op) = 0;
@@ -18,6 +20,8 @@ protected:
 
     bool is_pipe_op_reg_empty(PipeOpReg *reg);
     bool is_pipe_op_reg_full(PipeOpReg *reg);
+
+    void print_reg_out_as_nbout_write();
 
     PipeOpReg *reg_in;
     PipeOpReg *reg_out;

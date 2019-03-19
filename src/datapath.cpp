@@ -147,3 +147,25 @@ void Datapath::deactivate_nfu3() {
     nfu3->deactivate();
     nfu2->to_nbout();
 }
+
+void Datapath::switch_nfu2_to_add_mode() {
+    nfu2->to_add_mode();
+}
+
+void Datapath::switch_nfu2_to_max_mode() {
+    nfu2->to_max_mode();
+}
+
+bool Datapath::is_working() {
+    for(int i = 0; i < 4; ++i) {
+        if(!pipe_regs[i].empty()) {
+            return true;
+        }
+    }
+    for(int i = 0; i < 3; ++i) {
+        if(!pipe_stages[i]->is_pipe_line_empty()) {
+            return true;
+        }
+    }
+    return false;
+}

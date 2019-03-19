@@ -15,8 +15,8 @@ struct SramOp {
 };
 
 struct SramLine {
-    bool valid;       // ready to be read
-    bool is_partial_sum; // partial sum, can be overwritten
+    bool valid;             // for consistency
+    bool is_partial_sum;    // partial sum can be overwritten
 };
 
 struct SramPort {
