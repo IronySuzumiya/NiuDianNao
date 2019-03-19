@@ -17,7 +17,9 @@ Dram::Dram(const std::string& dram_config_file,
 }
 
 Dram::~Dram() {
-   delete dram_sim;
+    delete read_callback;
+    delete write_callback;
+    delete dram_sim;
 }
 
 void Dram::tick() {

@@ -9,3 +9,4 @@
 *WORK*
 /.vscode
 /obj
+*.log

@@ -4,6 +4,8 @@
 #include "common.hpp"
 
 #define MAKE_SRAM_OP(addr, size, is_read) {(addr), (size), (is_read), false}
+#define MAKE_SRAM_READ(addr, size) MAKE_SRAM_OP((addr), (size), true)
+#define MAKE_SRAM_WRITE(addr, size) MAKE_SRAM_OP((addr), (size), false)
 
 struct SramOp {
     mem_addr addr;
