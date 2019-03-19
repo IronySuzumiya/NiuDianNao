@@ -23,6 +23,22 @@ bool PipeStage::is_pipe_op_reg_full(PipeOpReg *reg) {
     return reg->size() >= queue_size;
 }
 
+void PipeStage::print_reg_out_as_nbout_write() {
+    if(reg_out->empty()) {
+        cout << "No active NBout write." << endl;
+    } else {
+        cout << "Active NBout write: | ";
+        for(PipeOpReg::reverse_iterator it = reg_out->rbegin(); it != reg_out->rend(); ++it) {
+            cout << (*it)->serial_num;
+            if((*it)->is_pending) {
+                cout << "*";
+            }
+            cout << " | ";
+        }
+        cout << endl;
+    }
+}
+
 void PipeStage::tick() {
     if (!is_pipe_op_reg_full(reg_out)) {
         if(pipeline[n_stages - 1]) {
@@ -85,4 +101,13 @@ void PipeStage::print() {
         cout << " | ";
     }
     cout << endl;
+}
+
+bool PipeStage::is_pipe_line_empty() {
+    for(int i = 0; i < n_stages; ++i) {
+        if(pipeline[i]) {
+            return false;
+        }
+    }
+    return true;
 }

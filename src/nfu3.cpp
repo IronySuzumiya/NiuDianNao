@@ -64,19 +64,7 @@ void PipeStageNFU3::tick() {
 void PipeStageNFU3::print() {
     if(is_activated) {
         PipeStage::print();
-        if(reg_out->empty()) {
-            cout << "No active NBout write." << endl;
-        } else {
-            cout << "Active NBout write: | ";
-            for(PipeOpReg::iterator it = reg_out->begin(); it != reg_out->end(); ++it) {
-                cout << (*it)->serial_num;
-                if((*it)->is_pending) {
-                    cout << "*";
-                }
-                cout << " | ";
-            }
-            cout << endl;
-        }
+        print_reg_out_as_nbout_write();
     }
 }
 

@@ -2,19 +2,17 @@
 
 using namespace std;
 
+#define print_line_info(addr, size) \
+do {\
+    cout << "line index = " << addr_to_line_index(addr) << ", line size = " << size_to_line_num(size);\
+} while(0)
+
 Sram::Sram(const string& name, int line_size, int num_lines, int bit_width,
-            int num_read_write_ports, int num_cycle_per_access) {
-
-    this->name = name;
-    this->line_size = line_size;
-    this->n_lines = num_lines;
-    this->bit_width = bit_width;
-    this->n_rw_ports = num_read_write_ports;
-    this->cycles_per_access = num_cycle_per_access;
-
-    n_reads = 0;
-    n_writes = 0;
-
+            int num_read_write_ports, int num_cycle_per_access)
+            : name(name), line_size(line_size), n_lines(num_lines),
+            bit_width(bit_width), n_rw_ports(num_read_write_ports),
+            cycles_per_access(num_cycle_per_access),
+            n_reads(0), n_writes(0) {
     ports = new SramPort[n_rw_ports];
     for(int i = 0; i < n_rw_ports; ++i) {
         ports[i].is_busy = false;
@@ -56,7 +54,12 @@ void Sram::tick() {
                     set_valid(op->addr, op->size);
                 }
                 cout << " is complete: ";
-                cout << " addr = " << op->addr << ", size = " << op->size << "." << endl;
+                cout << " addr = " << op->addr << ", size = " << op->size;
+                #if DEBUG
+                cout << ", ";
+                print_line_info(op->addr, op->size);
+                #endif
+                cout << "." << endl;
                 op->is_complete = true;
                 ports[i].is_busy = false;
                 ports[i].op = NULL;
@@ -91,7 +94,12 @@ void Sram::tick() {
             } else {
                 cout << "WRITE ";
             }
-            cout << "addr = " << op->addr << ", size = " << op->size << "." << endl;
+            cout << "addr = " << op->addr << ", size = " << op->size;
+            #if DEBUG
+            cout << ", ";
+            print_line_info(op->addr, op->size);
+            #endif
+            cout << "." << endl;
         }
     }
 }
@@ -184,9 +192,8 @@ bool Sram::read(int port, SramOp *op) {
     cout << " addr = " << addr << ", size = " << size;
 
     #if DEBUG
-    int line_index = addr_to_line_index(addr);
-    int line_num = size_to_line_num(size);
-    cout << ", line index = " << line_index << ", line size = " << line_num;
+    cout << ", ";
+    print_line_info(addr, size);
     #endif
 
     cout << "." << endl;
@@ -212,9 +219,8 @@ bool Sram::write(int port, SramOp *op) {
     cout << " addr = " << addr << ", size = " << size;
     
     #if DEBUG
-    int line_index = addr_to_line_index(addr);
-    int line_num = size_to_line_num(size);
-    cout << ", line index = " << line_index << ", line size = " << line_num;
+    cout << ", ";
+    print_line_info(addr, size);
     #endif
 
     cout << "." << endl;

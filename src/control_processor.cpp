@@ -2,27 +2,20 @@
 
 using namespace std;
 
-ControlProcessor::ControlProcessor(DnnConfig *cfg, Datapath *dp) {
-    this->cfg = cfg;
-    this->dp = dp;
-}
-
 void ControlProcessor::tick() {
     if(!ciq.empty()) {
         ControlInstruction *ci = &ciq.front();
         if(execute_instruction(ci)) {
-            cout << "Control instruction is done." << endl;
+            cout << "Control Instruction is Done:" << endl;
+            cout << ci << endl;
             ciq.pop();
         }
     }
 }
 
-void ControlProcessor::read_instruction(string s) {
-    ControlInstruction ins;
-    stringstream ss(s);
-    ss >> ins;
-    ins.state = ControlInstruction::BEGIN;
-    ciq.push(ins);
+void ControlProcessor::read_instructions(string s) {
+    stringstream is(s);
+    read_instructions(is);
 }
 
 void ControlProcessor::read_instructions(istream& is) {
@@ -32,6 +25,10 @@ void ControlProcessor::read_instructions(istream& is) {
         ins.state = ControlInstruction::BEGIN;
         ciq.push(ins);
     }
+}
+
+bool ControlProcessor::is_working() {
+    return !ciq.empty();
 }
 
 bool ControlProcessor::execute_instruction(ControlInstruction *ci) {
@@ -59,10 +56,10 @@ bool ControlProcessor::execute_instruction(ControlInstruction *ci) {
         }
         assert(ci->nfu_nfu1_op == ControlInstruction::MULT);
         if(ci->nfu_nfu2_op == ControlInstruction::ADD) {
-            // customize the datapath
+            dp->switch_nfu2_to_add_mode();
         } else {
             assert(ci->nfu_nfu2_op == ControlInstruction::MAX);
-            // customize the datapath
+            dp->switch_nfu2_to_max_mode();
         }
         if(ci->nfu_nfu2_in == ControlInstruction::RESET) {
             // customize the datapath
@@ -77,6 +74,9 @@ bool ControlProcessor::execute_instruction(ControlInstruction *ci) {
             dp->activate_nfu3();
         }
         assert(ci->nfu_nfu3_op == ControlInstruction::SIGMOID);
+
+        cout << "Current Control Instruction:" << endl;
+        cout << ci << endl;
     }
 
     switch(ci->state){

@@ -14,11 +14,14 @@ NiuDianNao::~NiuDianNao() {
 }
 
 void NiuDianNao::run() {
-    cp->read_instruction("| NOP || LOAD | 0 | 0 | 32768 "
+    cp->read_instructions("| NOP || LOAD | 0 | 0 | 32768 "
         "|| LOAD | 1 | 0 | 0 | 0 | 4194304 | 2048 "
         "|| NOP | WRITE | 0 | 0 || MULT | ADD | RESET | NBOUT | SIGMOID | 1 | 0 |");
-    for(int i = 0; i < 113; ++i) {
+    for(;;) {
         tick();
+        if(!cp->is_working() && !dp->is_working()) {
+            break;
+        }
     }
 }
 

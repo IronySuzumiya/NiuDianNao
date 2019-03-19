@@ -6,12 +6,14 @@
 
 class ControlProcessor {
 public:
-    ControlProcessor(DnnConfig *cfg, Datapath *dp);
+    ControlProcessor(DnnConfig *cfg, Datapath *dp) : cfg(cfg), dp(dp) {}
     ~ControlProcessor() {};
 
     void tick();
-    void read_instruction(std::string s);
+    void read_instructions(std::string s);
     void read_instructions(std::istream& is);
+
+    bool is_working();
     
 private:
     bool execute_instruction(ControlInstruction *ci);

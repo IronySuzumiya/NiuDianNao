@@ -12,6 +12,9 @@ public:
     void to_nbout();
     void to_nfu3();
 
+    void to_add_mode();
+    void to_max_mode();
+
     void tick();
     void print();
 
@@ -31,6 +34,7 @@ private:
     FunctionalUnit **max;
 
     bool is_to_nbout;
+    bool is_in_add_mode;
 
     Sram *nbout;
 };

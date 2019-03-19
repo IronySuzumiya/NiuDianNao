@@ -25,6 +25,7 @@ PipeStageNFU2::PipeStageNFU2(PipeOpReg *reg_in, PipeOpReg *reg_out,
     }
 
     is_to_nbout = true;
+    is_in_add_mode = true;
 }
 
 PipeStageNFU2::~PipeStageNFU2() {
@@ -52,6 +53,14 @@ void PipeStageNFU2::to_nfu3() {
     is_to_nbout = false;
 }
 
+void PipeStageNFU2::to_add_mode() {
+    is_in_add_mode = true;
+}
+
+void PipeStageNFU2::to_max_mode() {
+    is_in_add_mode = false;
+}
+
 void PipeStageNFU2::tick() {
     PipeStage::tick();
     if(is_to_nbout) {
@@ -74,31 +83,22 @@ void PipeStageNFU2::tick() {
 void PipeStageNFU2::print() {
     PipeStage::print();
     if(is_to_nbout) {
-        if(reg_out->empty()) {
-            cout << "No active NBout write." << endl;
-        } else {
-            cout << "Active NBout write: | ";
-            for(PipeOpReg::iterator it = reg_out->begin(); it != reg_out->end(); ++it) {
-                cout << (*it)->serial_num;
-                if((*it)->is_pending) {
-                    cout << "*";
-                }
-                cout << " | ";
-            }
-            cout << endl;
-        }
+        print_reg_out_as_nbout_write();
     }
 }
 
 void PipeStageNFU2::do_op() {
-    for(unsigned i = 0; i < num_adders; i++) {
-        adders[i]->do_op();
+    if(is_in_add_mode) {
+        for(unsigned i = 0; i < num_adders; i++) {
+            adders[i]->do_op();
+        }
+    } else {
+        for(unsigned i = 0; i < num_max; i++) {
+            max[i]->do_op();
+        }
     }
     for(unsigned i = 0; i < num_shifters; i++) {
         shifters[i]->do_op();
-    }
-    for(unsigned i = 0; i < num_max; i++) {
-        max[i]->do_op();
     }
 }
 

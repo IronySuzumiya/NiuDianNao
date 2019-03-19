@@ -36,6 +36,11 @@ public:
     void activate_nfu3();
     void deactivate_nfu3();
 
+    void switch_nfu2_to_add_mode();
+    void switch_nfu2_to_max_mode();
+
+    bool is_working();
+
 private:
     DnnConfig *cfg;
     
