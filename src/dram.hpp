@@ -13,6 +13,12 @@ struct DramOp {
     mem_size size;
     bool is_read;
     bool is_complete;
+    // Since the DRAM Databus Bitwidth is set to 64 bytes,
+    // we should separate a large DRAM request into several,
+    // and send them to DRAM one by one.
+    // But the whole process seems to be so slow,
+    // I wonder if it's appropriate or not.
+    std::deque<DramOp *> sub_ops;
 };
 
 class Dram {

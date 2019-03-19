@@ -89,12 +89,11 @@ void Datapath::tick() {
 
     nbin->tick();
     sb->tick();
+    nbout->tick();
 
     for(int i = 2; i >= 0; --i) {
         pipe_stages[i]->tick();
     }
-
-    nbout->tick();
 }
 
 void Datapath::print_pipeline() {
