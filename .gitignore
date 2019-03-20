@@ -9,4 +9,9 @@
 *WORK*
 /.vscode
 /obj
-*.log
+*.dep
+*.deppo
+*.o
+*.po
+DRAMSim
+ndn

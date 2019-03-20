@@ -40,6 +40,7 @@ public:
     void switch_nfu2_to_max_mode();
 
     bool is_working();
+    bool is_dram_working();
 
 private:
     DnnConfig *cfg;

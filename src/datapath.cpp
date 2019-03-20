@@ -167,6 +167,10 @@ bool Datapath::is_working() {
             return true;
         }
     }
-    return dram->is_working() || nbin->is_working()
-        || sb->is_working() || nbout->is_working();
+    return !load_requests.empty() || !store_requests.empty()
+        || nbin->is_working() || sb->is_working() || nbout->is_working();
+}
+
+bool Datapath::is_dram_working() {
+    return dram->is_working();
 }
