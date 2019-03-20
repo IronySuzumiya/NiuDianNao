@@ -81,15 +81,15 @@ bool ControlProcessor::execute_instruction(ControlInstruction *ci) {
 
     switch(ci->state){
         case ControlInstruction::LOAD_NBIN:
-            cout << "Load NBin: ADDR = " << ci->nbin_address
-                << " SIZE = " << ci->nbin_size << endl;
+            cout << "Load NBin: addr = " << ci->nbin_address
+                << ", size = " << ci->nbin_size << endl;
             dp->load_nbin(ci->nbin_address, 0, ci->nbin_size);
             ci->state = ControlInstruction::LOAD_SB;
             break;
         
         case ControlInstruction::LOAD_SB:
-            cout << "Load SB: ADDR = " << ci->sb_address
-                << " SIZE = " << ci->sb_size << endl;
+            cout << "Load SB: addr = " << ci->sb_address
+                << ", size = " << ci->sb_size << endl;
             dp->load_sb(ci->sb_address, 0, ci->sb_size);
             ci->state = ControlInstruction::DO_OP;
             sb_index = 0;
@@ -107,9 +107,9 @@ bool ControlProcessor::execute_instruction(ControlInstruction *ci) {
                 int nbin_addr   = nbin_index    * cfg->nbin_line_length    * data_size;
                 int nbout_addr  = nbout_index   * cfg->nbout_line_length   * data_size;
 
-                cout << "Next Op: NBIN ADDR = " << nbin_addr
-                    << ", SB ADDR = " << sb_addr
-                    << ", NBOUT ADDR = " << nbout_addr << endl;
+                cout << "Next Op: NBin addr = " << nbin_addr
+                    << ", SB addr = " << sb_addr
+                    << ", NBout addr = " << nbout_addr << endl;
 
                 PipeOp *op = new PipeOp(nbin_addr, 16 * 2, sb_addr, 256 * 2, nbout_addr, 16 * 2);
                 dp->push_pipe_op(op);
@@ -126,9 +126,9 @@ bool ControlProcessor::execute_instruction(ControlInstruction *ci) {
             break;
 
         case ControlInstruction::STORE_NBOUT:
-            cout << "Store NBout: ADDR = " << ci->nbout_address
-                << " SIZE = " << ci->nbout_size << endl;
-            dp->store_nbout(0, ci->nbout_address, ci->nbout_size);
+            cout << "Store NBout: addr = " << ci->nbout_address
+                << ", size = " << ci->nbout_size << endl;
+            dp->store_nbout(ci->nbout_address, 0, ci->nbout_size);
             done = true;
             break;
 

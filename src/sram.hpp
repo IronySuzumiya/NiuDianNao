@@ -37,6 +37,8 @@ public:
 
     void push_request(SramOp *op);
 
+    bool is_working();
+
 private:
     bool read(int port, SramOp *op);
     bool write(int port, SramOp *op);
