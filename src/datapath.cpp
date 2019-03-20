@@ -167,5 +167,6 @@ bool Datapath::is_working() {
             return true;
         }
     }
-    return false;
+    return dram->is_working() || nbin->is_working()
+        || sb->is_working() || nbout->is_working();
 }

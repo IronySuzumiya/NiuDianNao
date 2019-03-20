@@ -108,6 +108,15 @@ void Sram::push_request(SramOp *op) {
     requests.push(op);
 }
 
+bool Sram::is_working() {
+    for(int i = 0; i < n_rw_ports; ++i) {
+        if(ports[i].is_busy) {
+            return true;
+        }
+    }
+    return !requests.empty();
+}
+
 int Sram::addr_to_line_index(mem_addr addr) {
     return addr / line_size;
 }
