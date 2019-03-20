@@ -25,12 +25,6 @@ Dram::~Dram() {
 }
 
 void Dram::tick() {
-    for(DramReqDeque::iterator it = active_requests.begin(); it != active_requests.end(); ++it) {
-        if((*it)->owner->size == 33) {
-            int a = 3;
-        }
-    }
-
     if(!new_requests.empty()) {
         do {
             if(dram_sim->willAcceptTransaction()) {
@@ -55,12 +49,6 @@ void Dram::tick() {
         } while(!new_requests.empty());
     }
     dram_sim->update();
-
-    for(DramReqDeque::iterator it = active_requests.begin(); it != active_requests.end(); ++it) {
-        if((*it)->owner->size == 33) {
-            int a = 3;
-        }
-    }
 }
 
 void Dram::push_request(DramOp *op) {
