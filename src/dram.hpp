@@ -54,7 +54,7 @@ public:
     bool is_working();
 
 private:
-    void erase_finished_request(uint64_t addr);
+    void erase_finished_request(uint64_t addr, bool is_read);
 
     DRAMSim::MultiChannelMemorySystem *dram_sim;
     DRAMSim::TransactionCompleteCB *read_callback;

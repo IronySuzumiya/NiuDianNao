@@ -68,13 +68,21 @@ void Dram::push_request(DramOp *op) {
 void Dram::read_complete_callback(unsigned id, uint64_t addr, uint64_t clock_cycle) {
     cout << "DRAM READ is complete: addr = "  <<  addr << endl;
 
-    erase_finished_request(addr);
+    erase_finished_request(addr
+    #if !FAST_DRAM_ACCESS
+    , true
+    #endif
+    );
 }
 
 void Dram::write_complete_callback(unsigned id, uint64_t addr, uint64_t clock_cycle) {
-    cout << "DRAM READ is complete: addr = "  <<  addr << endl;
+    cout << "DRAM WRITE is complete: addr = "  <<  addr << endl;
 
-    erase_finished_request(addr);
+    erase_finished_request(addr
+    #if !FAST_DRAM_ACCESS
+    , false
+    #endif
+    );
 }
 
 bool Dram::is_working() {
@@ -98,7 +106,7 @@ void Dram::erase_finished_request(uint64_t addr) {
     }
 }
 #else
-void Dram::erase_finished_request(uint64_t addr) {
+void Dram::erase_finished_request(uint64_t addr, bool is_read) {
     DramReqDeque::iterator it;
 
     for(it = active_requests.begin(); it != active_requests.end(); ++it) {
@@ -119,7 +127,13 @@ void Dram::erase_finished_request(uint64_t addr) {
             if(owner->sub_ops.empty()) {
                 owner->is_complete = true;
 
-                cout << "DRAM Bulk READ is complete: addr = " << owner->addr;
+                cout << "DRAM Bulk ";
+                if(is_read) {
+                    cout << "READ";
+                } else {
+                    cout << "WRITE";
+                }
+                cout << " is complete: addr = " << owner->addr;
                 cout << ", size = " << owner->size << endl;
 
                 deque<DramOp *>::iterator o_o_it;

@@ -126,10 +126,12 @@ bool ControlProcessor::execute_instruction(ControlInstruction *ci) {
             break;
 
         case ControlInstruction::STORE_NBOUT:
-            cout << "Store NBout: addr = " << ci->nbout_address
-                << ", size = " << ci->nbout_size << endl;
-            dp->store_nbout(ci->nbout_address, 0, ci->nbout_size);
-            done = true;
+            if(!dp->is_working()) {
+                cout << "Store NBout: addr = " << ci->nbout_address
+                    << ", size = " << ci->nbout_size << endl;
+                dp->store_nbout(ci->nbout_address, 0, ci->nbout_size);
+                done = true;
+            }
             break;
 
         default:
