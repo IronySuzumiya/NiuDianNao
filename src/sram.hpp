@@ -65,8 +65,8 @@ private:
     int n_rw_ports;
     int cycles_per_access;
     
-    SramPort *ports;
-    SramLine *lines;
+    std::vector<SramPort> *ports;
+    std::vector<SramLine> *lines;
     
     long n_reads;
     long n_writes;

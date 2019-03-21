@@ -13,26 +13,30 @@ Sram::Sram(const string& name, int line_size, int num_lines, int bit_width,
             bit_width(bit_width), n_rw_ports(num_read_write_ports),
             cycles_per_access(num_cycle_per_access),
             n_reads(0), n_writes(0) {
-    ports = new SramPort[n_rw_ports];
-    for(int i = 0; i < n_rw_ports; ++i) {
-        ports[i].is_busy = false;
-        ports[i].cur_access_cycle = 0;
-        ports[i].op = NULL;
-    }
 
-    lines = new SramLine[n_lines];
-    for(int i = 0; i < n_lines; ++i) {
-        lines[i].valid = true;
-        lines[i].is_partial_sum = true;
+    ports = new std::vector<SramPort>(n_rw_ports);
+    for( std::vector<SramPort>::iterator iter = ports->begin(); iter != ports->end(); iter++)
+    {
+        (*iter).is_busy = false;
+        (*iter).cur_access_cycle = 0;
+        (*iter).op = NULL;
     }
+    
+    lines = new std::vector<SramLine>(n_lines);
+    for(std::vector<SramLine>::iterator iter = lines->begin(); iter != lines->end(); iter++)
+    {
+        (*iter).valid = true;
+        (*iter).is_partial_sum = true;
+    }
+    
 }
 
 Sram::~Sram() {
-    if (ports) {
+    if (ports->empty()) {
         delete [] ports;
     }
 
-    if (lines) {
+    if (lines->empty()) {
         delete [] lines;
     }
 }
@@ -41,11 +45,11 @@ void Sram::tick() {
     bool all_ports_busy = true;
 
     for(int i = 0; i < n_rw_ports; ++i) {
-        if(ports[i].is_busy){
+        if((*ports)[i].is_busy){
             cout << "SRAM " << name << " port " << i << " is busy." << endl;
-            ++ports[i].cur_access_cycle;
-            if(ports[i].cur_access_cycle >= cycles_per_access) {
-                SramOp *op = ports[i].op;
+            ++(*ports)[i].cur_access_cycle;
+            if((*ports)[i].cur_access_cycle >= cycles_per_access) {
+                SramOp *op = (*ports)[i].op;
                 cout << "SRAM " << name << " port " << i;
                 if(op->is_read) {
                     cout << " READ";
@@ -61,8 +65,8 @@ void Sram::tick() {
                 #endif
                 cout << "." << endl;
                 op->is_complete = true;
-                ports[i].is_busy = false;
-                ports[i].op = NULL;
+                (*ports)[i].is_busy = false;
+                (*ports)[i].op = NULL;
 
                 all_ports_busy = false;
             }
@@ -74,7 +78,7 @@ void Sram::tick() {
     if(!requests.empty()) {
         if(!all_ports_busy) {
             for(int i = 0; i < n_rw_ports; ++i) {
-                if(!ports[i].is_busy) {
+                if(!(*ports)[i].is_busy) {
                     SramOp *op = requests.front();
                     requests.pop();
                     if(op->is_read) {
@@ -110,7 +114,7 @@ void Sram::push_request(SramOp *op) {
 
 bool Sram::is_working() {
     for(int i = 0; i < n_rw_ports; ++i) {
-        if(ports[i].is_busy) {
+        if((*ports)[i].is_busy) {
             return true;
         }
     }
@@ -142,7 +146,7 @@ bool Sram::check_valid(mem_addr addr, mem_size size) {
     }
 
     for(int i = line_index; i < line_num; ++i) {
-        if(!lines[i].valid) {
+        if(!(*lines)[i].valid) {
             return false;
         }
     }
@@ -162,7 +166,7 @@ bool Sram::check_write(mem_addr addr, mem_size size) {
     }
 
     for(int i = line_index; i < line_num; ++i) {
-        if(!lines[i].is_partial_sum) {
+        if(!(*lines)[i].is_partial_sum) {
             return false;
         }
     }
@@ -174,7 +178,7 @@ void Sram::set_valid(mem_addr addr, mem_size size) {
     int line_num = size_to_line_num(size);
 
     for(int i = line_index; i < line_num; ++i) {
-        lines[i].valid = true;
+        (*lines)[i].valid = true;
     }
 }
 
@@ -183,7 +187,7 @@ void Sram::reset_valid(mem_addr addr, mem_size size) {
     int line_num = size_to_line_num(size);
 
     for(int i = line_index; i < line_num; ++i) {
-        lines[i].valid = false;
+        (*lines)[i].valid = false;
     }
 }
 
@@ -207,9 +211,9 @@ bool Sram::read(int port, SramOp *op) {
 
     cout << "." << endl;
 
-    ports[port].is_busy = true;
-    ports[port].cur_access_cycle = 0;
-    ports[port].op = op;
+    (*ports)[port].is_busy = true;
+    (*ports)[port].cur_access_cycle = 0;
+    (*ports)[port].op = op;
 
     return true;
 }
@@ -237,9 +241,9 @@ bool Sram::write(int port, SramOp *op) {
     // For Consistency Requirements
     reset_valid(addr, size);
 
-    ports[port].is_busy = true;
-    ports[port].cur_access_cycle = 0;
-    ports[port].op = op;
+    (*ports)[port].is_busy = true;
+    (*ports)[port].cur_access_cycle = 0;
+    (*ports)[port].op = op;
 
     return true;
 }
