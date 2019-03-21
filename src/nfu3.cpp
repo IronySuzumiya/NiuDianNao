@@ -82,7 +82,7 @@ bool PipeStageNFU3::is_ready_to_fetch(PipeOp *op) {
 }
 
 void PipeStageNFU3::preprocess_op(PipeOp *op) {
-    write_nbout(&op->nbout_write_op);
+    return;
 }
 
 void PipeStageNFU3::write_nbout(SramOp *op) {
