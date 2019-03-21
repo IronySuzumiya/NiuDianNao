@@ -19,6 +19,8 @@ Dram::Dram(const string& dram_config_file,
 }
 
 Dram::~Dram() {
+    dram_sim->printStats(true);
+
     delete read_callback;
     delete write_callback;
     delete dram_sim;
@@ -43,6 +45,13 @@ void Dram::tick() {
                 #endif
                     op->addr);
                 active_requests.push_back(op);
+                cout << "DRAM ";
+                if(op->owner->is_read) {
+                    cout << "READ";
+                } else {
+                    cout << "WRITE";
+                }
+                cout << " is sent: addr = " << op->addr << ", size = 64." << endl;
             } else {
                 break;
             }
@@ -62,11 +71,18 @@ void Dram::push_request(DramOp *op) {
         new_requests.push(sop);
     }
     original_requests.push_back(op);
+    cout << "DRAM Bulk ";
+    if(op->is_read) {
+        cout << "READ";
+    } else {
+        cout << "WRITE";
+    }
+    cout << " is sent: addr = " << op->addr << ", size = " << op->size << "." << endl;
     #endif
 }
 
 void Dram::read_complete_callback(unsigned id, uint64_t addr, uint64_t clock_cycle) {
-    cout << "DRAM READ is complete: addr = "  <<  addr << endl;
+    cout << "DRAM READ is complete: addr = "  <<  addr << ", size = 64." << endl;
 
     erase_finished_request(addr
     #if !FAST_DRAM_ACCESS
@@ -76,7 +92,7 @@ void Dram::read_complete_callback(unsigned id, uint64_t addr, uint64_t clock_cyc
 }
 
 void Dram::write_complete_callback(unsigned id, uint64_t addr, uint64_t clock_cycle) {
-    cout << "DRAM WRITE is complete: addr = "  <<  addr << endl;
+    cout << "DRAM WRITE is complete: addr = "  <<  addr << ", size = 64." << endl;
 
     erase_finished_request(addr
     #if !FAST_DRAM_ACCESS
@@ -134,7 +150,7 @@ void Dram::erase_finished_request(uint64_t addr, bool is_read) {
                     cout << "WRITE";
                 }
                 cout << " is complete: addr = " << owner->addr;
-                cout << ", size = " << owner->size << endl;
+                cout << ", size = " << owner->size << "." << endl;
 
                 deque<DramOp *>::iterator o_o_it;
                 for(o_o_it = original_requests.begin(); o_o_it != original_requests.end(); ++o_o_it) {

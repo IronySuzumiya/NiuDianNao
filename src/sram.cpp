@@ -54,7 +54,7 @@ void Sram::tick() {
                     set_valid(op->addr, op->size);
                 }
                 cout << " is complete: ";
-                cout << " addr = " << op->addr << ", size = " << op->size;
+                cout << "addr = " << op->addr << ", size = " << op->size;
                 #if DEBUG
                 cout << ", ";
                 print_line_info(op->addr, op->size);
@@ -198,7 +198,7 @@ bool Sram::read(int port, SramOp *op) {
     ++n_reads;
 
     std::cout << "SRAM " << name << " port " << port << " READ is sent: ";
-    cout << " addr = " << addr << ", size = " << size;
+    cout << "addr = " << addr << ", size = " << size;
 
     #if DEBUG
     cout << ", ";
@@ -225,7 +225,7 @@ bool Sram::write(int port, SramOp *op) {
     ++n_writes;
 
     std::cout << "SRAM " << name << " port " << port << " WRITE is sent: ";
-    cout << " addr = " << addr << ", size = " << size;
+    cout << "addr = " << addr << ", size = " << size;
     
     #if DEBUG
     cout << ", ";
