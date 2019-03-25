@@ -8,6 +8,7 @@ struct ControlInstruction {
         BEGIN,
         LOAD_SB,
         LOAD_NBIN,
+        CUSTOMIZE,
         DO_OP,
         STORE_NBOUT
     };

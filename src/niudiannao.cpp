@@ -14,9 +14,8 @@ NiuDianNao::~NiuDianNao() {
 }
 
 void NiuDianNao::run() {
-    cp->read_instructions("| NOP || LOAD | 0 | 0 | 32768 "
-        "|| LOAD | 1 | 0 | 0 | 0 | 4194304 | 2048 "
-        "|| NOP | STORE | 0 | 256 || MULT | ADD | RESET | NBOUT | SIGMOID | 1 | 0 |");
+    ifstream is("inst");
+    cp->read_instructions(is);
     for(;;) {
         tick();
         if(!cp->is_working() && !dp->is_working() && !dp->is_dram_working()) {

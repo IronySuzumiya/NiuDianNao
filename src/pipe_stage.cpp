@@ -11,8 +11,12 @@ PipeStage::PipeStage(PipeOpReg *reg_in, PipeOpReg *reg_out, int queue_size, int 
 }
 
 PipeStage::~PipeStage() {
-    if(pipeline)
-        delete [] pipeline;
+    for(int i = 0; i < n_stages; ++i) {
+        if(pipeline[i]) {
+            delete pipeline[i];
+        }
+    }
+    delete [] pipeline;
 }
 
 bool PipeStage::is_pipe_op_reg_empty(PipeOpReg *reg) {
@@ -55,10 +59,6 @@ void PipeStage::tick() {
                 assert(!pipeline[0]);
                 (*it)->is_pending = false;
                 pipeline[0] = (*it);
-                it = reg_in->erase(it);
-            } else if((*it)->is_complete()) {
-                assert((*it)->is_pending);
-                delete *it;
                 it = reg_in->erase(it);
             } else if(!(*it)->is_pending) {
                 (*it)->is_pending = true;

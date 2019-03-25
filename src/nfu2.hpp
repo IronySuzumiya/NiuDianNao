@@ -15,6 +15,9 @@ public:
     void to_add_mode();
     void to_max_mode();
 
+    void in_reset();
+    void in_from_nbout();
+
     void tick();
     void print();
 
@@ -35,6 +38,7 @@ private:
 
     bool is_to_nbout;
     bool is_in_add_mode;
+    bool is_from_nbout;
 
     Sram *nbout;
 };

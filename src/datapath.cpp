@@ -114,7 +114,7 @@ void Datapath::push_pipe_op(PipeOp *op) {
 void Datapath::load_nbin(mem_addr dram_addr, mem_addr sram_addr, mem_size size) {
     LoadStoreOp *op = new LoadStoreOp({nbin,
         MAKE_DRAM_READ(dram_addr, size),
-        MAKE_SRAM_WRITE(sram_addr, size),
+        MAKE_SRAM_WRITE_PARTIAL(sram_addr, size),
         false});
     load_requests.push_back(op);
     dram->push_request(&op->dram_op);
@@ -123,7 +123,7 @@ void Datapath::load_nbin(mem_addr dram_addr, mem_addr sram_addr, mem_size size) 
 void Datapath::load_sb(mem_addr dram_addr, mem_addr sram_addr, mem_size size) {
     LoadStoreOp *op = new LoadStoreOp({sb,
         MAKE_DRAM_READ(dram_addr, size),
-        MAKE_SRAM_WRITE(sram_addr, size),
+        MAKE_SRAM_WRITE_PARTIAL(sram_addr, size),
         false});
     load_requests.push_back(op);
     dram->push_request(&op->dram_op);
@@ -156,6 +156,14 @@ void Datapath::switch_nfu2_to_max_mode() {
     nfu2->to_max_mode();
 }
 
+void Datapath::nfu2_read_reset() {
+    nfu2->in_reset();
+}
+
+void Datapath::nfu2_read_nbout() {
+    nfu2->in_from_nbout();
+}
+
 bool Datapath::is_working() {
     for(int i = 0; i < 4; ++i) {
         if(!pipe_regs[i].empty()) {
@@ -173,4 +181,8 @@ bool Datapath::is_working() {
 
 bool Datapath::is_dram_working() {
     return dram->is_working();
+}
+
+bool Datapath::can_write_back() {
+    return nbout->check_write_back();
 }

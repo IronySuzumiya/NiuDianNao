@@ -39,9 +39,13 @@ public:
     void switch_nfu2_to_add_mode();
     void switch_nfu2_to_max_mode();
 
+    void nfu2_read_reset();
+    void nfu2_read_nbout();
+
     bool is_working();
     bool is_dram_working();
 
+    bool can_write_back();
 private:
     DnnConfig *cfg;
     

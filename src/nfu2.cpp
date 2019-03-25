@@ -61,6 +61,14 @@ void PipeStageNFU2::to_max_mode() {
     is_in_add_mode = false;
 }
 
+void PipeStageNFU2::in_reset() {
+    is_from_nbout = false;
+}
+
+void PipeStageNFU2::in_from_nbout() {
+    is_from_nbout = true;
+}
+
 void PipeStageNFU2::tick() {
     PipeStage::tick();
     if(is_to_nbout) {
@@ -103,7 +111,7 @@ void PipeStageNFU2::do_op() {
 }
 
 bool PipeStageNFU2::is_ready_to_fetch(PipeOp *op) {
-    return op->is_ready_to_nfu2();
+    return !is_from_nbout || op->is_ready_to_nfu2();
 }
 
 void PipeStageNFU2::preprocess_op(PipeOp *op) {

@@ -7,6 +7,54 @@ do {\
     cout << "line index = " << addr_to_line_index(addr) << ", line size = " << size_to_line_num(size);\
 } while(0)
 
+#define check(addr, size, cond, any) \
+do {\
+    int line_index = addr_to_line_index(addr);\
+    int line_num = size_to_line_num(size);\
+    if(line_index >= n_lines) {\
+        return false;\
+    }\
+    for(int i = line_index; i < line_num; ++i) {\
+        if(any) {\
+            check_any(cond);\
+        } else {\
+            check_not_any(cond);\
+        }\
+    }\
+    return true;\
+} while(0)
+
+#define check_any(cond) \
+do {\
+    if(lines[i].cond) {\
+        return false;\
+    }\
+} while(0)
+
+#define check_not_any(cond) \
+do {\
+    if(!lines[i].cond) {\
+        return false;\
+    }\
+} while(0)
+
+#define set_field(field, is_set) \
+do {\
+    int line_index = addr_to_line_index(addr);\
+    int line_num = size_to_line_num(size);\
+    for(int i = line_index; i < line_num; ++i) {\
+        if(is_set) {\
+            set(field);\
+        } else {\
+            reset(field);\
+        }\
+    }\
+} while(0)
+
+#define set(field) lines[i].field = true
+
+#define reset(field) lines[i].field = false
+
 Sram::Sram(const string& name, int line_size, int num_lines, int bit_width,
             int num_read_write_ports, int num_cycle_per_access)
             : name(name), line_size(line_size), n_lines(num_lines),
@@ -59,6 +107,15 @@ void Sram::tick() {
                 cout << ", ";
                 print_line_info(op->addr, op->size);
                 #endif
+                if(!op->is_read) {
+                    if(op->is_partial_sum) {
+                        cout << ", partial";
+                        set_partial(op->addr, op->size);
+                    } else {
+                        cout << ", final";
+                        set_final(op->addr, op->size);
+                    }
+                }
                 cout << "." << endl;
                 op->is_complete = true;
                 ports[i].is_busy = false;
@@ -99,6 +156,13 @@ void Sram::tick() {
             cout << ", ";
             print_line_info(op->addr, op->size);
             #endif
+            if(!op->is_read) {
+                if(op->is_partial_sum) {
+                    cout << ", partial";
+                } else {
+                    cout << ", final";
+                }
+            }
             cout << "." << endl;
         }
     }
@@ -115,6 +179,13 @@ bool Sram::is_working() {
         }
     }
     return !requests.empty();
+}
+
+bool Sram::check_write_back() {
+    // FIXME
+    return true;
+
+    //check(0, line_size * n_lines, is_partial_sum, true);
 }
 
 int Sram::addr_to_line_index(mem_addr addr) {
@@ -134,19 +205,7 @@ bool Sram::check_size(mem_size size) {
 }
 
 bool Sram::check_valid(mem_addr addr, mem_size size) {
-    int line_index = addr_to_line_index(addr);
-    int line_num = size_to_line_num(size);
-
-    if(line_index >= n_lines) {
-        return false;
-    }
-
-    for(int i = line_index; i < line_num; ++i) {
-        if(!lines[i].valid) {
-            return false;
-        }
-    }
-    return true;
+    check(addr, size, valid, false);
 }
 
 bool Sram::check_read(mem_addr addr, mem_size size) {
@@ -154,37 +213,26 @@ bool Sram::check_read(mem_addr addr, mem_size size) {
 }
 
 bool Sram::check_write(mem_addr addr, mem_size size) {
-    int line_index = addr_to_line_index(addr);
-    int line_num = size_to_line_num(size);
-
-    if(line_index >= n_lines) {
-        return false;
-    }
-
-    for(int i = line_index; i < line_num; ++i) {
-        if(!lines[i].is_partial_sum) {
-            return false;
-        }
-    }
+    //FIXME
     return true;
+
+    //check(addr, size, is_partial_sum, false);
 }
 
 void Sram::set_valid(mem_addr addr, mem_size size) {
-    int line_index = addr_to_line_index(addr);
-    int line_num = size_to_line_num(size);
-
-    for(int i = line_index; i < line_num; ++i) {
-        lines[i].valid = true;
-    }
+    set_field(valid, true);
 }
 
 void Sram::reset_valid(mem_addr addr, mem_size size) {
-    int line_index = addr_to_line_index(addr);
-    int line_num = size_to_line_num(size);
+    set_field(valid, false);
+}
 
-    for(int i = line_index; i < line_num; ++i) {
-        lines[i].valid = false;
-    }
+void Sram::set_partial(mem_addr addr, mem_size size) {
+    set_field(is_partial_sum, true);
+}
+
+void Sram::set_final(mem_addr addr, mem_size size) {
+    set_field(is_partial_sum, false);
 }
 
 bool Sram::read(int port, SramOp *op) {
@@ -231,6 +279,11 @@ bool Sram::write(int port, SramOp *op) {
     cout << ", ";
     print_line_info(addr, size);
     #endif
+    if(op->is_partial_sum) {
+        cout << ", partial";
+    } else {
+        cout << ", final";
+    }
 
     cout << "." << endl;
 

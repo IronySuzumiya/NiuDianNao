@@ -3,14 +3,16 @@
 
 #include "common.hpp"
 
-#define MAKE_SRAM_OP(addr, size, is_read) {(addr), (size), (is_read), false}
-#define MAKE_SRAM_READ(addr, size) MAKE_SRAM_OP((addr), (size), true)
-#define MAKE_SRAM_WRITE(addr, size) MAKE_SRAM_OP((addr), (size), false)
+#define MAKE_SRAM_OP(addr, size, is_read, is_partial_sum) {(addr), (size), (is_read), is_partial_sum, false}
+#define MAKE_SRAM_READ(addr, size)          MAKE_SRAM_OP((addr), (size), true, true)
+#define MAKE_SRAM_WRITE_PARTIAL(addr, size) MAKE_SRAM_OP((addr), (size), false, true)
+#define MAKE_SRAM_WRITE_FINAL(addr, size)   MAKE_SRAM_OP((addr), (size), false, false)
 
 struct SramOp {
     mem_addr addr;
     mem_size size;
     bool is_read;
+    bool is_partial_sum;
     bool is_complete;
 };
 
@@ -39,6 +41,8 @@ public:
 
     bool is_working();
 
+    bool check_write_back();
+
 private:
     bool read(int port, SramOp *op);
     bool write(int port, SramOp *op);
@@ -55,6 +59,9 @@ private:
 
     void set_valid(mem_addr addr, mem_size size);
     void reset_valid(mem_addr addr, mem_size size);
+
+    void set_partial(mem_addr addr, mem_size size);
+    void set_final(mem_addr addr, mem_size size);
 
     SramOpReg requests;
 
