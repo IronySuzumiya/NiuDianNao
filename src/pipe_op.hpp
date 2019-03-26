@@ -8,7 +8,8 @@ static long long global_serial_num = 0;
 struct PipeOp {
     PipeOp(mem_addr nbin_addr, mem_size nbin_size,
         mem_addr sb_addr, mem_size sb_size,
-        mem_addr nbout_addr, mem_size nbout_size);
+        mem_addr nbout_addr, mem_size nbout_size,
+        bool is_partial_sum);
     ~PipeOp() {};
 
     bool is_ready_to_nfu1();
@@ -21,6 +22,7 @@ struct PipeOp {
     SramOp nbout_read_op;
     SramOp nbout_write_op;
     bool is_pending;
+    bool is_partial_sum;
 };
 
 typedef std::deque<PipeOp *> PipeOpReg;

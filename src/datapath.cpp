@@ -108,13 +108,12 @@ bool Datapath::is_ready() {
 
 void Datapath::push_pipe_op(PipeOp *op) {
     pipe_regs[0].push_back(op);
-    ++tot_op_issue;
 }
 
 void Datapath::load_nbin(mem_addr dram_addr, mem_addr sram_addr, mem_size size) {
     LoadStoreOp *op = new LoadStoreOp({nbin,
         MAKE_DRAM_READ(dram_addr, size),
-        MAKE_SRAM_WRITE(sram_addr, size),
+        MAKE_SRAM_WRITE_PARTIAL(sram_addr, size),
         false});
     load_requests.push_back(op);
     dram->push_request(&op->dram_op);
@@ -123,7 +122,7 @@ void Datapath::load_nbin(mem_addr dram_addr, mem_addr sram_addr, mem_size size) 
 void Datapath::load_sb(mem_addr dram_addr, mem_addr sram_addr, mem_size size) {
     LoadStoreOp *op = new LoadStoreOp({sb,
         MAKE_DRAM_READ(dram_addr, size),
-        MAKE_SRAM_WRITE(sram_addr, size),
+        MAKE_SRAM_WRITE_PARTIAL(sram_addr, size),
         false});
     load_requests.push_back(op);
     dram->push_request(&op->dram_op);
@@ -138,22 +137,20 @@ void Datapath::store_nbout(mem_addr dram_addr, mem_addr sram_addr, mem_size size
     nbout->push_request(&op->sram_op);
 }
 
-void Datapath::activate_nfu3() {
-    nfu3->activate();
-    nfu2->to_nfu3();
-}
-
-void Datapath::deactivate_nfu3() {
-    nfu3->deactivate();
-    nfu2->to_nbout();
-}
-
 void Datapath::switch_nfu2_to_add_mode() {
     nfu2->to_add_mode();
 }
 
 void Datapath::switch_nfu2_to_max_mode() {
     nfu2->to_max_mode();
+}
+
+void Datapath::nfu2_read_reset() {
+    nfu2->in_reset();
+}
+
+void Datapath::nfu2_read_nbout() {
+    nfu2->in_from_nbout();
 }
 
 bool Datapath::is_working() {
@@ -173,4 +170,8 @@ bool Datapath::is_working() {
 
 bool Datapath::is_dram_working() {
     return dram->is_working();
+}
+
+bool Datapath::can_write_back() {
+    return nbout->check_write_back();
 }

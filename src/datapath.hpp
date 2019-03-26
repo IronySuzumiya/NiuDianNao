@@ -33,15 +33,16 @@ public:
     void load_sb(mem_addr dram_addr, mem_addr sram_addr, mem_size size);
     void store_nbout(mem_addr dram_addr, mem_addr sram_addr, mem_size size);
 
-    void activate_nfu3();
-    void deactivate_nfu3();
-
     void switch_nfu2_to_add_mode();
     void switch_nfu2_to_max_mode();
+
+    void nfu2_read_reset();
+    void nfu2_read_nbout();
 
     bool is_working();
     bool is_dram_working();
 
+    bool can_write_back();
 private:
     DnnConfig *cfg;
     
@@ -56,9 +57,6 @@ private:
     Dram *dram;
     std::deque<LoadStoreOp *> load_requests;
     std::deque<LoadStoreOp *> store_requests;
-
-    int64_t tot_op_issue;
-    int64_t tot_op_complete;
 };
 
 #endif
