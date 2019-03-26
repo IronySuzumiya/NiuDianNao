@@ -33,9 +33,6 @@ public:
     void load_sb(mem_addr dram_addr, mem_addr sram_addr, mem_size size);
     void store_nbout(mem_addr dram_addr, mem_addr sram_addr, mem_size size);
 
-    void activate_nfu3();
-    void deactivate_nfu3();
-
     void switch_nfu2_to_add_mode();
     void switch_nfu2_to_max_mode();
 
@@ -60,9 +57,6 @@ private:
     Dram *dram;
     std::deque<LoadStoreOp *> load_requests;
     std::deque<LoadStoreOp *> store_requests;
-
-    int64_t tot_op_issue;
-    int64_t tot_op_complete;
 };
 
 #endif

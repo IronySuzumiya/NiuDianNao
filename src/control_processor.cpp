@@ -2,6 +2,13 @@
 
 using namespace std;
 
+ControlProcessor::ControlProcessor(DnnConfig *cfg, Datapath *dp)
+            : cfg(cfg), dp(dp), data_size(cfg->bit_width / 8),
+            num_output_lines(cfg->num_outputs / cfg->nbout_line_length),
+            nfu3_flag(cfg->nbin_line_length * cfg->nbin_num_lines / cfg->num_outputs - 1) {
+
+}
+
 void ControlProcessor::tick() {
     if(!ciq.empty()) {
         ControlInstruction *ci = &ciq.front();
@@ -19,9 +26,8 @@ void ControlProcessor::read_instructions(string s) {
 }
 
 void ControlProcessor::read_instructions(istream& is) {
-    while(!is.eof()) {
-        ControlInstruction ins;
-        is >> ins;
+    ControlInstruction ins;
+    while(is >> ins) {
         ins.state = ControlInstruction::BEGIN;
         cout << "Read Control Instruction:" << endl;
         cout << ins << endl;
@@ -37,6 +43,7 @@ bool ControlProcessor::execute_instruction(ControlInstruction *ci) {
     bool done = false;
 
     if(ci->state == ControlInstruction::BEGIN) {
+        nfu3_on = false;
         assert(ci->sb_read_op == ControlInstruction::LOAD);
         if(ci->nbin_read_op == ControlInstruction::LOAD) {
             ci->state = ControlInstruction::LOAD_NBIN;
@@ -49,6 +56,14 @@ bool ControlProcessor::execute_instruction(ControlInstruction *ci) {
         } else {
             assert(ci->nbout_read_op == ControlInstruction::NOP);
             assert(ci->nfu_nfu2_out == ControlInstruction::NBOUT);
+        }
+        if(ci->nbout_write_op == ControlInstruction::WRITE) {
+            nbout_store = false;
+            assert(ci->nfu_nfu2_out == ControlInstruction::NBOUT);
+        } else {
+            assert(ci->nbout_write_op == ControlInstruction::STORE);
+            nbout_store = true;
+            assert(ci->nfu_nfu2_out == ControlInstruction::NFU3);
         }
         assert(ci->nfu_nfu1_op == ControlInstruction::MULT);
         assert(ci->nfu_nfu3_op == ControlInstruction::SIGMOID);
@@ -77,16 +92,7 @@ state_machine:
             if(!dp->is_ready()) {
                 break;
             }
-            // In practice, this state should not occupy one process cycle.
-            // But since datapath is waiting for DRAM access at this moment,
-            // this won't hurt.
             cout << "Customize Datapath." << endl;
-            if(ci->nbout_write_op == ControlInstruction::WRITE) {
-                nbout_store = false;
-            } else {
-                assert(ci->nbout_write_op == ControlInstruction::STORE);
-                nbout_store = true;
-            }
             if(ci->nfu_nfu2_op == ControlInstruction::ADD) {
                 dp->switch_nfu2_to_add_mode();
             } else {
@@ -100,10 +106,10 @@ state_machine:
                 dp->nfu2_read_nbout();
             }
             if(ci->nfu_nfu2_out == ControlInstruction::NBOUT) {
-                dp->deactivate_nfu3();
+                assert(!nbout_store);
             } else {
                 assert(ci->nfu_nfu2_out == ControlInstruction::NFU3);
-                dp->activate_nfu3();
+                assert(nbout_store);
             }
             ci->state = ControlInstruction::DO_OP;
             goto state_machine;
@@ -111,27 +117,18 @@ state_machine:
 
         case ControlInstruction::DO_OP:
             {
-                // FIXME:
-                //
-                // /-----------------------------------\
-                // | W0,0     W0,1    ...     W0,15    |  ...  W0,255
-                // | ...      ...     ...     ...      |  ...  ...
-                // | W1023,0  W1023,1 ...     W1023,15 |  ...  W1023,255
-                // \-----------------------------------/
+                // /-----------------------------------------------------\
+                // | W0,0     W0,1    ...     W0,15    |  ...  W0,255    |
+                // | ...      ...     ...     ...      |  ...  ...       |
+                // | W15,0    W15,1   ...     W15,15   |  ...  W15,255   |
+                // \-----------------------------------/-----------------/
+                // | ...      ...     ...     ...         ...  ...       |
+                // | W1023,0  W1023,1 ...     W1023,15    ...  W1023,255 |
+                // \-----------------------------------------------------/
                 //   ...      ...     ...     ...         ...  ...
                 //   W8191,0  W8191,1 ...     W8191,15    ...  W8191,255
-                //
-                // /-----------------------------------\
-                // | W0,0     W0,1    ...     W0,15    |
-                // | W1,0     W1,1    ...     W1,15    |
-                // | ...      ...     ...     ...      |
-                // | W15,0    W15,1   ...     W15,15   |
-                // \-----------------------------------/
 
-                int data_size = (cfg->bit_width / 8); // in bytes
-
-                int num_output_lines    = cfg->num_outputs / cfg->nbout_line_length;
-                int nbin_index          = sb_index / num_output_lines;
+                int nbin_index          = sb_index % num_output_lines;
                 int nbout_index         = sb_index % num_output_lines;
 
                 int sb_addr     = sb_index      * cfg->sb_line_length      * data_size;
@@ -141,8 +138,14 @@ state_machine:
                 cout << "Next Op: NBin addr = " << nbin_addr
                     << ", SB addr = " << sb_addr
                     << ", NBout addr = " << nbout_addr << "." << endl;
-                // FIXME: 'is_partial' should not be '!nbout_store'
-                PipeOp *op = new PipeOp(nbin_addr, 16 * 2, sb_addr, 256 * 2, nbout_addr, 16 * 2, !nbout_store);
+                
+                if(nbout_store && !nfu3_on) {
+                    nfu3_on = nfu3_flag <= 0 || sb_index / num_output_lines == nfu3_flag;
+                }
+                PipeOp *op = new PipeOp(nbin_addr, cfg->nbin_line_length * data_size,
+                                        sb_addr, cfg->sb_line_length * data_size,
+                                        nbout_addr, cfg->nbout_line_length * data_size,
+                                        !nfu3_on);
                 dp->push_pipe_op(op);
                 ++sb_index;
 

@@ -117,19 +117,19 @@
  | NOP || LOAD | 0 | 3604480 | 32768 || READ | 1 | 0 | 0 | 0 | 0 | 0 || NOP | WRITE | 0 | 0 || MULT | ADD | NBOUT | NBOUT | SIGMOID | 0 | 0 | 
  | NOP || LOAD | 0 | 3637248 | 32768 || READ | 1 | 0 | 0 | 0 | 0 | 0 || NOP | WRITE | 0 | 0 || MULT | ADD | NBOUT | NBOUT | SIGMOID | 0 | 0 | 
 
- | NOP || LOAD | 0 | 3670016 | 32768 || LOAD | 1 | 0 | 0 | 0 | 4208640 | 2048 || READ | WRITE | 0 | 0 || MULT | ADD | NBOUT | NFU3 | SIGMOID | 0 | 0 | 
- | NOP || LOAD | 0 | 3702784 | 32768 || READ | 1 | 0 | 0 | 0 | 0 | 0 || READ | WRITE | 0 | 0 || MULT | ADD | NBOUT | NFU3 | SIGMOID | 0 | 0 | 
- | NOP || LOAD | 0 | 3735552 | 32768 || READ | 1 | 0 | 0 | 0 | 0 | 0 || READ | WRITE | 0 | 0 || MULT | ADD | NBOUT | NFU3 | SIGMOID | 0 | 0 | 
- | NOP || LOAD | 0 | 3768320 | 32768 || READ | 1 | 0 | 0 | 0 | 0 | 0 || READ | WRITE | 0 | 0 || MULT | ADD | NBOUT | NFU3 | SIGMOID | 0 | 0 | 
- | NOP || LOAD | 0 | 3801088 | 32768 || READ | 1 | 0 | 0 | 0 | 0 | 0 || READ | WRITE | 0 | 0 || MULT | ADD | NBOUT | NFU3 | SIGMOID | 0 | 0 | 
- | NOP || LOAD | 0 | 3833856 | 32768 || READ | 1 | 0 | 0 | 0 | 0 | 0 || READ | WRITE | 0 | 0 || MULT | ADD | NBOUT | NFU3 | SIGMOID | 0 | 0 | 
- | NOP || LOAD | 0 | 3866624 | 32768 || READ | 1 | 0 | 0 | 0 | 0 | 0 || READ | WRITE | 0 | 0 || MULT | ADD | NBOUT | NFU3 | SIGMOID | 0 | 0 | 
- | NOP || LOAD | 0 | 3899392 | 32768 || READ | 1 | 0 | 0 | 0 | 0 | 0 || READ | WRITE | 0 | 0 || MULT | ADD | NBOUT | NFU3 | SIGMOID | 0 | 0 | 
- | NOP || LOAD | 0 | 3932160 | 32768 || READ | 1 | 0 | 0 | 0 | 0 | 0 || READ | WRITE | 0 | 0 || MULT | ADD | NBOUT | NFU3 | SIGMOID | 0 | 0 | 
- | NOP || LOAD | 0 | 3964928 | 32768 || READ | 1 | 0 | 0 | 0 | 0 | 0 || READ | WRITE | 0 | 0 || MULT | ADD | NBOUT | NFU3 | SIGMOID | 0 | 0 | 
- | NOP || LOAD | 0 | 3997696 | 32768 || READ | 1 | 0 | 0 | 0 | 0 | 0 || READ | WRITE | 0 | 0 || MULT | ADD | NBOUT | NFU3 | SIGMOID | 0 | 0 | 
- | NOP || LOAD | 0 | 4030464 | 32768 || READ | 1 | 0 | 0 | 0 | 0 | 0 || READ | WRITE | 0 | 0 || MULT | ADD | NBOUT | NFU3 | SIGMOID | 0 | 0 | 
- | NOP || LOAD | 0 | 4063232 | 32768 || READ | 1 | 0 | 0 | 0 | 0 | 0 || READ | WRITE | 0 | 0 || MULT | ADD | NBOUT | NFU3 | SIGMOID | 0 | 0 | 
- | NOP || LOAD | 0 | 4096000 | 32768 || READ | 1 | 0 | 0 | 0 | 0 | 0 || READ | WRITE | 0 | 0 || MULT | ADD | NBOUT | NFU3 | SIGMOID | 0 | 0 | 
- | NOP || LOAD | 0 | 4128768 | 32768 || READ | 1 | 0 | 0 | 0 | 0 | 0 || READ | WRITE | 0 | 0 || MULT | ADD | NBOUT | NFU3 | SIGMOID | 0 | 0 | 
+ | NOP || LOAD | 0 | 3670016 | 32768 || LOAD | 1 | 0 | 0 | 0 | 4208640 | 2048 || NOP | WRITE | 0 | 0 || MULT | ADD | NBOUT | NBOUT | SIGMOID | 0 | 0 | 
+ | NOP || LOAD | 0 | 3702784 | 32768 || READ | 1 | 0 | 0 | 0 | 0 | 0 || NOP | WRITE | 0 | 0 || MULT | ADD | NBOUT | NBOUT | SIGMOID | 0 | 0 | 
+ | NOP || LOAD | 0 | 3735552 | 32768 || READ | 1 | 0 | 0 | 0 | 0 | 0 || NOP | WRITE | 0 | 0 || MULT | ADD | NBOUT | NBOUT | SIGMOID | 0 | 0 | 
+ | NOP || LOAD | 0 | 3768320 | 32768 || READ | 1 | 0 | 0 | 0 | 0 | 0 || NOP | WRITE | 0 | 0 || MULT | ADD | NBOUT | NBOUT | SIGMOID | 0 | 0 | 
+ | NOP || LOAD | 0 | 3801088 | 32768 || READ | 1 | 0 | 0 | 0 | 0 | 0 || NOP | WRITE | 0 | 0 || MULT | ADD | NBOUT | NBOUT | SIGMOID | 0 | 0 | 
+ | NOP || LOAD | 0 | 3833856 | 32768 || READ | 1 | 0 | 0 | 0 | 0 | 0 || NOP | WRITE | 0 | 0 || MULT | ADD | NBOUT | NBOUT | SIGMOID | 0 | 0 | 
+ | NOP || LOAD | 0 | 3866624 | 32768 || READ | 1 | 0 | 0 | 0 | 0 | 0 || NOP | WRITE | 0 | 0 || MULT | ADD | NBOUT | NBOUT | SIGMOID | 0 | 0 | 
+ | NOP || LOAD | 0 | 3899392 | 32768 || READ | 1 | 0 | 0 | 0 | 0 | 0 || NOP | WRITE | 0 | 0 || MULT | ADD | NBOUT | NBOUT | SIGMOID | 0 | 0 | 
+ | NOP || LOAD | 0 | 3932160 | 32768 || READ | 1 | 0 | 0 | 0 | 0 | 0 || NOP | WRITE | 0 | 0 || MULT | ADD | NBOUT | NBOUT | SIGMOID | 0 | 0 | 
+ | NOP || LOAD | 0 | 3964928 | 32768 || READ | 1 | 0 | 0 | 0 | 0 | 0 || NOP | WRITE | 0 | 0 || MULT | ADD | NBOUT | NBOUT | SIGMOID | 0 | 0 | 
+ | NOP || LOAD | 0 | 3997696 | 32768 || READ | 1 | 0 | 0 | 0 | 0 | 0 || NOP | WRITE | 0 | 0 || MULT | ADD | NBOUT | NBOUT | SIGMOID | 0 | 0 | 
+ | NOP || LOAD | 0 | 4030464 | 32768 || READ | 1 | 0 | 0 | 0 | 0 | 0 || NOP | WRITE | 0 | 0 || MULT | ADD | NBOUT | NBOUT | SIGMOID | 0 | 0 | 
+ | NOP || LOAD | 0 | 4063232 | 32768 || READ | 1 | 0 | 0 | 0 | 0 | 0 || NOP | WRITE | 0 | 0 || MULT | ADD | NBOUT | NBOUT | SIGMOID | 0 | 0 | 
+ | NOP || LOAD | 0 | 4096000 | 32768 || READ | 1 | 0 | 0 | 0 | 0 | 0 || NOP | WRITE | 0 | 0 || MULT | ADD | NBOUT | NBOUT | SIGMOID | 0 | 0 | 
+ | NOP || LOAD | 0 | 4128768 | 32768 || READ | 1 | 0 | 0 | 0 | 0 | 0 || NOP | WRITE | 0 | 0 || MULT | ADD | NBOUT | NBOUT | SIGMOID | 0 | 0 | 
  | NOP || LOAD | 0 | 4161536 | 32768 || READ | 1 | 0 | 0 | 0 | 0 | 0 || READ | STORE | 8388608 | 512 || MULT | ADD | NBOUT | NFU3 | SIGMOID | 0 | 0 | 

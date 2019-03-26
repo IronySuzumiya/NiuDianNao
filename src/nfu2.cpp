@@ -24,7 +24,6 @@ PipeStageNFU2::PipeStageNFU2(PipeOpReg *reg_in, PipeOpReg *reg_out,
         max[i] = new FunctionalUnit();
     }
 
-    is_to_nbout = true;
     is_in_add_mode = true;
 }
 
@@ -45,14 +44,6 @@ PipeStageNFU2::~PipeStageNFU2() {
     delete[] max;
 }
 
-void PipeStageNFU2::to_nbout() {
-    is_to_nbout = true;
-}
-
-void PipeStageNFU2::to_nfu3() {
-    is_to_nbout = false;
-}
-
 void PipeStageNFU2::to_add_mode() {
     is_in_add_mode = true;
 }
@@ -71,8 +62,8 @@ void PipeStageNFU2::in_from_nbout() {
 
 void PipeStageNFU2::tick() {
     PipeStage::tick();
-    if(is_to_nbout) {
-        for(PipeOpReg::iterator it = reg_out->begin(); it != reg_out->end(); ) {
+    for(PipeOpReg::iterator it = reg_out->begin(); it != reg_out->end(); ) {
+        if((*it)->is_partial_sum) {
             if((*it)->is_complete()) {
                 assert((*it)->is_pending);
                 delete *it;
@@ -84,14 +75,9 @@ void PipeStageNFU2::tick() {
             } else {
                 ++it;
             }
+        } else {
+            ++it;
         }
-    }
-}
-
-void PipeStageNFU2::print() {
-    PipeStage::print();
-    if(is_to_nbout) {
-        print_reg_out_as_nbout_write();
     }
 }
 

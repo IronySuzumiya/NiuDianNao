@@ -7,7 +7,8 @@ PipeOp::PipeOp(mem_addr nbin_addr, mem_size nbin_size,
         : nbin_read_op(MAKE_SRAM_READ(nbin_addr, nbin_size)),
         sb_read_op(MAKE_SRAM_READ(sb_addr, sb_size)),
         nbout_read_op(MAKE_SRAM_READ(nbout_addr, nbout_size)),
-        serial_num(global_serial_num++), is_pending(false) {
+        serial_num(global_serial_num++), is_pending(false),
+        is_partial_sum(is_partial_sum) {
     if(is_partial_sum) {
         nbout_write_op = MAKE_SRAM_WRITE_PARTIAL(nbout_addr, nbout_size);
     } else {

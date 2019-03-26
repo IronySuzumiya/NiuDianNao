@@ -22,6 +22,7 @@ struct PipeOp {
     SramOp nbout_read_op;
     SramOp nbout_write_op;
     bool is_pending;
+    bool is_partial_sum;
 };
 
 typedef std::deque<PipeOp *> PipeOpReg;

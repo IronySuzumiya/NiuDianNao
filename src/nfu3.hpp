@@ -9,9 +9,6 @@ public:
     PipeStageNFU3(PipeOpReg *reg_in, PipeOpReg *reg_out, int queue_size, int n_stages, unsigned num_multipliers, unsigned num_adders, Sram *nbout);
     ~PipeStageNFU3();
 
-    void activate();
-    void deactivate();
-
     void tick();
     void print();
 
@@ -26,8 +23,6 @@ private:
     unsigned num_adders;
     FunctionalUnit **multipliers;
     FunctionalUnit **adders;
-
-    bool is_activated;
 
     Sram *nbout;
 };

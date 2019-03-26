@@ -6,7 +6,7 @@
 
 class ControlProcessor {
 public:
-    ControlProcessor(DnnConfig *cfg, Datapath *dp) : cfg(cfg), dp(dp) {}
+    ControlProcessor(DnnConfig *cfg, Datapath *dp);
     ~ControlProcessor() {};
 
     void tick();
@@ -22,6 +22,10 @@ private:
     Datapath *dp;
     CIQueue ciq;
 
+    int num_output_lines;
+    int data_size;
+    int nfu3_flag;
+    bool nfu3_on;
     bool nbout_store;
 
     int sb_index;   // used to track progress of instruction in the DO_OP state

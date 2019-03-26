@@ -21,7 +21,7 @@ protected:
     bool is_pipe_op_reg_empty(PipeOpReg *reg);
     bool is_pipe_op_reg_full(PipeOpReg *reg);
 
-    void print_reg_out_as_nbout_write();
+    void print_reg_out();
 
     PipeOpReg *reg_in;
     PipeOpReg *reg_out;

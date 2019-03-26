@@ -18,8 +18,6 @@ PipeStageNFU3::PipeStageNFU3(PipeOpReg *reg_in, PipeOpReg *reg_out,
     for(unsigned i = 0; i < num_adders; ++i){
         adders[i] = new FunctionalUnit();
     }
-
-    is_activated = false;
 }
 
 PipeStageNFU3::~PipeStageNFU3() {
@@ -34,38 +32,26 @@ PipeStageNFU3::~PipeStageNFU3() {
     delete[] adders;
 }
 
-void PipeStageNFU3::activate() {
-    is_activated = true;
-}
-
-void PipeStageNFU3::deactivate() {
-    is_activated = false;
-}
-
 void PipeStageNFU3::tick() {
-    if(is_activated) {
-        PipeStage::tick();
-        for(PipeOpReg::iterator it = reg_out->begin(); it != reg_out->end(); ) {
-            if((*it)->is_complete()) {
-                assert((*it)->is_pending);
-                delete *it;
-                it = reg_out->erase(it);
-            } else if(!(*it)->is_pending) {
-                write_nbout(&(*it)->nbout_write_op);
-                (*it)->is_pending = true;
-                ++it;
-            } else {
-                ++it;
-            }
+    PipeStage::tick();
+    for(PipeOpReg::iterator it = reg_out->begin(); it != reg_out->end(); ) {
+        if((*it)->is_complete()) {
+            assert((*it)->is_pending);
+            delete *it;
+            it = reg_out->erase(it);
+        } else if(!(*it)->is_pending) {
+            write_nbout(&(*it)->nbout_write_op);
+            (*it)->is_pending = true;
+            ++it;
+        } else {
+            ++it;
         }
     }
 }
 
 void PipeStageNFU3::print() {
-    if(is_activated) {
-        PipeStage::print();
-        print_reg_out_as_nbout_write();
-    }
+    PipeStage::print();
+    print_reg_out();
 }
 
 void PipeStageNFU3::do_op() {
@@ -78,7 +64,7 @@ void PipeStageNFU3::do_op() {
 }
 
 bool PipeStageNFU3::is_ready_to_fetch(PipeOp *op) {
-    return is_activated;
+    return !op->is_partial_sum;
 }
 
 void PipeStageNFU3::preprocess_op(PipeOp *op) {

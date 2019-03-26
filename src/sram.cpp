@@ -14,7 +14,7 @@ do {\
     if(line_index >= n_lines) {\
         return false;\
     }\
-    for(int i = line_index; i < line_num; ++i) {\
+    for(int i = line_index; i < line_index + line_num; ++i) {\
         if(any) {\
             check_any(cond);\
         } else {\
@@ -42,7 +42,7 @@ do {\
 do {\
     int line_index = addr_to_line_index(addr);\
     int line_num = size_to_line_num(size);\
-    for(int i = line_index; i < line_num; ++i) {\
+    for(int i = line_index; i < line_index + line_num; ++i) {\
         if(is_set) {\
             set(field);\
         } else {\
@@ -182,10 +182,7 @@ bool Sram::is_working() {
 }
 
 bool Sram::check_write_back() {
-    // FIXME
-    return true;
-
-    //check(0, line_size * n_lines, is_partial_sum, true);
+    check(0, line_size * n_lines, is_partial_sum, true);
 }
 
 int Sram::addr_to_line_index(mem_addr addr) {
@@ -213,10 +210,7 @@ bool Sram::check_read(mem_addr addr, mem_size size) {
 }
 
 bool Sram::check_write(mem_addr addr, mem_size size) {
-    //FIXME
-    return true;
-
-    //check(addr, size, is_partial_sum, false);
+    check(addr, size, is_partial_sum, false);
 }
 
 void Sram::set_valid(mem_addr addr, mem_size size) {

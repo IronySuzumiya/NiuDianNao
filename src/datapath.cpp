@@ -108,7 +108,6 @@ bool Datapath::is_ready() {
 
 void Datapath::push_pipe_op(PipeOp *op) {
     pipe_regs[0].push_back(op);
-    ++tot_op_issue;
 }
 
 void Datapath::load_nbin(mem_addr dram_addr, mem_addr sram_addr, mem_size size) {
@@ -136,16 +135,6 @@ void Datapath::store_nbout(mem_addr dram_addr, mem_addr sram_addr, mem_size size
         false});
     store_requests.push_back(op);
     nbout->push_request(&op->sram_op);
-}
-
-void Datapath::activate_nfu3() {
-    nfu3->activate();
-    nfu2->to_nfu3();
-}
-
-void Datapath::deactivate_nfu3() {
-    nfu3->deactivate();
-    nfu2->to_nbout();
 }
 
 void Datapath::switch_nfu2_to_add_mode() {
