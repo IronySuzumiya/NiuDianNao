@@ -67,6 +67,7 @@ std::string generate_classify_layer_code (unsigned num_input_neurons,
                                           unsigned sb_addr,
                                           unsigned nbin_addr,
                                           unsigned nbout_addr,
+                                          std::ostream& os,
                                           bool verbose = true);
 
 #endif

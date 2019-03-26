@@ -121,6 +121,7 @@ std::string generate_classify_layer_code (unsigned num_input_neurons,
                                           unsigned sb_addr,
                                           unsigned nbin_addr,
                                           unsigned nbout_addr,
+                                          std::ostream& os,
                                           bool verbose) {
 
     // various performance counter
@@ -233,7 +234,7 @@ std::string generate_classify_layer_code (unsigned num_input_neurons,
         is_new_block = false;
 
         // output load instruction
-        std::cout << inst << stat.inst_report(verbose) << std::endl;
+        os << inst << stat.inst_report(verbose) << std::endl;
       }
 
     } while (remaining_output_neurons > 0);

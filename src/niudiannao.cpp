@@ -2,6 +2,8 @@
 
 using namespace std;
 
+static const char instfile[] = "inst";
+
 NiuDianNao::NiuDianNao(DnnConfig *cfg) {
     dp = new Datapath(cfg);
     cp = new ControlProcessor(cfg, dp);
@@ -14,12 +16,11 @@ NiuDianNao::~NiuDianNao() {
 }
 
 void NiuDianNao::run() {
-    ifstream is("inst");
+    ifstream is(instfile);
     cp->read_instructions(is);
     for(;;) {
         tick();
         if(!cp->is_working() && !dp->is_working() && !dp->is_dram_working()) {
-            tick();
             break;
         }
     }
