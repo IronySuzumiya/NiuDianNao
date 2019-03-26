@@ -19,6 +19,7 @@ void NiuDianNao::run() {
     for(;;) {
         tick();
         if(!cp->is_working() && !dp->is_working() && !dp->is_dram_working()) {
+            tick();
             break;
         }
     }
