@@ -1,5 +1,8 @@
 
-## 1.Order of Arguments:
+## 1.Argument File:
+./args
+
+## 2.Order of Arguments:
 * num_input_neurons
 * num_output_neurons
 * num_input_neurons_per_entry
@@ -12,5 +15,8 @@
 * nbin_addr
 * nbout_addr
 
-## 2 example
-./classify 8192 256 16 16 64 64 16 16 0 4194304 0 
+## 3.Output File:
+./inst
+
+## 4.Usage
+./classify
